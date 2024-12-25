@@ -1,0 +1,260 @@
+﻿@page "/advertiser/createwebsitecampaign/{campaignid}"
+@inject NavigationManager nv
+@using Newtonsoft.Json
+
+
+
+@if (viewopened == 1)
+{
+    <SetupComponent @key="1" websites="websites"  
+                    
+                    title="@currentcampaign.title"  Budget="@currentcampaign.budget" DailyBudget="@currentcampaign.dailybudget" Description="@currentcampaign.desc" EndDate="@currentcampaign.enddate" Target="@currentcampaign.targeturl"
+                    
+                    title_error="@error_title" Description_error="@error_description" Budget_error="@error_budget" DailyBudget_error="@error_dailybudget" Target_error="@error_target" EndDate_error="@error_enddate"
+                    
+                    OnBudgetChanged="@(async (args) => await ChangeBudget(args))" OnTargetChanged="@(async (args) => await ChangeTarget(args))" 
+                    OnTitleChanged="@(async (args) => await ChangeTitle(args))" OnDescriptionChanged="@(async (args) => await ChangeDescription(args))" 
+                    OnEndDateChanged="@(async (args) => await ChangeEndDate(args))" OnDailyBudgetChanged="@(async (args) => await ChangeDailyBudget(args))"
+                    OnToPreview="ToPreview"
+                    
+
+                    
+                    ></SetupComponent>
+}
+
+@if (viewopened == 2)
+{
+    <PreviewComponent @key="2" currentcampaign="@currentcampaign" websites="@websitesforpreview" ></PreviewComponent>
+}
+
+@if (viewopened == 3)
+{
+    <MashdropWebClient.Pages.Advertiser.CashAccount.DepositOnCampaignCreateComponent  depositvalue="@currentcampaign.budget" OnStripeIdCreated="@(async (args) => await WaitForDeposit(args))" ></MashdropWebClient.Pages.Advertiser.CashAccount.DepositOnCampaignCreateComponent>
+}
+
+<div class="row footer-step">
+    <div class="col-auto footer-select"><i class="fas fa-circle"></i> @websites.Count Websites Selected</div>
+    <div class="col footer-websites text-left"></div>
+    @* <div class="col-auto footer-websites text-left">Audience: <span>@estaudience</span></div>
+        @*<div class="col-auto footer-websites text-left">CPC:<span>n/a</span></div>*@
+    @if (viewopened == 1)
+    {
+        <div class="col-auto text-right"><a class="btn-big btn-green" @onclick="@(async () => await ToPreview())">Next</a><label style="font-size:12px;color:#ff0000">@publisherroroutput</label></div>
+        
+    }
+    else
+    {
+        @if (!is_publishloading)
+        {
+
+
+            <div class="col-auto text-right"><a class="btn-big btn-red mb-2" @onclick="@ToSetup">Back to setup</a></div>
+            <div class="col-auto text-right"><a class="btn-big btn-green" @onclick="@Publish">Publish</a></div>
+
+        }
+        else
+        {
+            <div class="col-auto text-right"><img src="buttonloader1.gif" /></div>
+        }
+    }
+
+</div>
+
+
+
+@code {
+    //   [Parameter]
+    // public int estaudience { get; set; }
+
+    int viewopened = 1;
+
+    //errors
+    string error_title = "";
+    string error_description = "";
+    string error_target = "";
+    string error_budget = "";
+    string error_dailybudget = "";
+    string error_enddate = "";
+
+    Dictionary<string, string> websites;
+
+    GeneralModels.Advertiser.CreateCampaigns.Websites.CampaignModel currentcampaign;
+
+    [Parameter]
+    public string campaignid { get; set; }
+
+
+    List<GeneralModels.Advertiser.CreateCampaigns.Websites.DraftModel> websitesforpreview;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        websites = GeneralLogic.GeneralObjects.websitecampaigncreate.currentwebsites;
+    }
+
+    protected override void OnParametersSet()
+    {
+
+        currentcampaign =   new GeneralModels.Advertiser.CreateCampaigns.Websites.CampaignModel() {
+            cmp = campaignid
+        };
+    }
+
+    async Task ToPreview()
+    {
+
+        bool is_error = false;
+        if (currentcampaign.title == "" || currentcampaign.title == null)
+        {
+            error_title = "No title entered";
+            is_error = true;
+        }
+        if (currentcampaign.targeturl == "" || currentcampaign.targeturl == null)
+        {
+            error_target = "No target entered";
+            is_error = true;
+        }
+
+        if (currentcampaign.enddate == null || currentcampaign.enddate == new DateTime())
+        {
+            error_enddate = "No end date entered";
+            is_error = true;
+        }
+        if (currentcampaign.budget == 0)
+        {
+            error_budget = "No budget entered";
+            is_error = true;
+        }
+        if (currentcampaign.dailybudget == 0)
+        {
+            error_dailybudget = "No daily budget entered";
+            is_error = true;
+        }
+        if (currentcampaign.title.Length > 150)
+        {
+            error_title = "Title too long";
+        }
+
+        if (is_error)
+        {
+            return;
+        }
+
+        websitesforpreview = new List<GeneralModels.Advertiser.CreateCampaigns.Websites.DraftModel>();
+
+        foreach (var item in websites)
+        {
+            websitesforpreview.Add(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.GetDraftWebsiteDetails(item.Key));
+        }
+        Console.WriteLine(websitesforpreview.Count);
+        viewopened = 2;
+    }
+
+
+    void ToSetup()
+    {
+
+        viewopened = 1;
+    }
+
+    #region campaign data changes
+
+    async Task ChangeTitle(string newvalue)
+    {
+        currentcampaign.title = newvalue;
+    }
+
+    async Task ChangeBudget(double newvalue)
+    {
+        currentcampaign.budget = newvalue;
+    }
+
+    async Task ChangeDailyBudget(double newvalue)
+    {
+        currentcampaign.dailybudget = newvalue;
+    }
+
+
+    async Task ChangeTarget(string newvalue)
+    {
+        currentcampaign.targeturl = newvalue;
+    }
+
+    async Task ChangeEndDate(DateTime newvalue)
+    {
+        currentcampaign.enddate = newvalue;
+    }
+
+    async Task ChangeDescription(string newvalue)
+    {
+        currentcampaign.desc = newvalue;
+    }
+
+
+
+    #endregion
+
+    bool is_publishloading = false;
+    string publisherroroutput = "";
+    async Task Publish()
+    {
+        currentcampaign.desc = "n";
+        currentcampaign.wids = "n";
+        List<int> errors = await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("advertiser/websites/insertcampaign", currentcampaign)).Content.ReadFromJsonAsync<List<int>>();
+        if (errors.Count == 0)
+        {
+            nv.NavigateTo("/advertiser/websitestatistics/campaignlistpage");
+        }
+
+        foreach (var item in errors)
+        {
+            switch (item)
+            {
+                case 1:
+                    publisherroroutput += "\nbudget needs to be at least $5";
+                    break;
+                case 2:
+                    publisherroroutput += "\ndaily budget to high or budget too low";
+                    break;
+                case 3:
+                    publisherroroutput += "\ndescription too long";
+                    break;
+                case 4:
+                    publisherroroutput += "\ntitle too long";
+                    break;
+                case 5:
+                    viewopened = 3;
+
+                    break;
+                case 6:
+                    publisherroroutput += "\npayment failed technical error";
+                    break;
+                case 7:
+                    publisherroroutput += "\nfailed to create campaign";
+                    break;
+                case 8:
+                    publisherroroutput += "\nfailed to create campaign";
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    async Task WaitForDeposit(string args)
+    {
+        is_publishloading = true;
+        int tries = 0;
+        int status = 0;
+
+
+        while (tries < 100 && status == 1)
+        {
+            await Task.Delay(3000);
+            status =   await GeneralLogic.Advertiser.CashAccount.Deposits.CheckStatus(args);
+        }
+
+        is_publishloading = false;
+    }
+}

@@ -1,0 +1,834 @@
+﻿@inject IJSRuntime js
+
+ 
+@if (FetchedWebsites != null)
+{
+
+ 
+<div class="container-fluid table-limit">
+    
+
+
+    <div class="row step-header mt-5 mywebsites">
+
+
+
+        <div class="col-lg-12">
+            <h3>My Listings</h3>
+            <div class="campaign-table table-no-limit">
+                <div class="row">
+
+                    @if (FetchedWebsites != null)
+                    {
+
+                        foreach (var item in FetchedWebsites)
+                        {
+
+
+                            <div @onclick="@( async () =>
+                                              {
+                                                  await SelectWebsite(item.id);
+
+
+                                              })" style="cursor:pointer;" class="col-xl-12 col-lg-4 col-sm-4">
+                                <div style="@(selected_websiteid == item.id ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" class="site-status">
+                                    <div class="row justify-content-between">
+                                        <div class="col-auto site-number">@item.website</div>
+
+                                        @switch (item.status)
+                                        {
+                                            case 1:
+                                                <div class="col-auto signup-link green-back pt-1 pl-3 pr-3">
+
+                                                    <i class="fas fa-circle"></i> Verified
+                                                </div>
+                                                break;
+                                            case 2:
+                                                <div class="col-auto signup-link green-back pt-1 pl-3 pr-3">
+
+                                                    <i class="fas fa-circle"></i> Suspended
+                                                </div>
+                                                break;
+                                            case 3:
+                                                <div class="col-auto signup-link green-back pt-1 pl-3 pr-3">
+
+                                                    <i class="fas fa-circle"></i> Suspended by admin
+                                                </div>
+                                                break;
+                                            case 4:
+                                                <div class="col-auto signup-link green-back pt-1 pl-3 pr-3">
+
+                                                    <i class="fas fa-circle"></i> Verification pending
+                                                </div>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+
+
+
+                </div>
+
+
+
+            </div>
+        </div>
+
+        @if (!isloading)
+        {
+
+
+
+            <div class="col-xl col-lg-6">
+
+                @if (currentwebsite.status != 4)
+                {
+                    <h3>Modify A Listing</h3>
+                }
+                else
+                {
+
+                    <h3>Verify A Listing</h3>
+                }
+
+
+                <div class="campaign-table">
+                    <div class="row">
+                        @if (currentwebsite.status != 4)
+                        {
+                            <div class="col-12">
+                                <div class="form-group select-website scat">
+                                    <div class="dropdown dropdown-input">
+                                        <button class="btn btn-srcsub dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            @WebsiteCategories.namelist[currentwebsite.cat]
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li @onclick="@(() => SetSearchCategory(1, "Fashion/Beauty"))"><label>Fashion/Beauty</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(2, "Travel/Lifestyle"))"><label>Travel/Lifestyle</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(3, "Celebrity/Entertainment"))"><label>Celebrity/Entertainment</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(4, "Sports"))"><label>Sports</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(5, "Gaming"))"><label>Gaming</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(6, "Health/Fitness"))"><label>Health/Fitness</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(7, "Family/Home"))"><label>Family/Home</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(8, "Business"))"><label>Business</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(9, "Alternative Lifestyle"))"><label>Alternative Lifestyle</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(10, "Food/Cooking"))"><label>Food/Cooking</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(11, "Spiritual/Motivational"))"><label>Spiritual/Motivational</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(12, "Information/Education"))"><label>Information/Education</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(13, "Technology"))"><label>technology</label></li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-lg" id="divresim">
+
+                                        <div class="file-upload">
+                                            <div class="image-upload-wrap">
+
+                                                @if (currentwebsite.logoid == null || currentwebsite.logoid == "")
+                                                {
+                                                    <input class="file-upload-input" type='file' id="listinglogofilepicker" @onchange="@(async () => await UploadImageFile())" accept="image/*" />
+                                                }
+                                                else
+                                                {
+                                                    <input class="file-upload-input" type='file' id="listinglogofilepicker" hidden="hidden" @onchange="@(async () => await UploadImageFile())" accept="image/*" />
+                                                }
+
+                                                @if (currentwebsite.logoid != null || currentwebsite.logoid != "")
+                                                {
+                                                    <img class="file-upload-image" height="400" width="450" src="https://testapi.vendo.media/download/websitelistinglogo?id=@currentwebsite.logoid" />
+                                                }
+                                            </div>
+                                            <div class="d-flex justify-content-center mt-3">
+                                                <button type="button" class="btn-big btn-green"
+                                                        @onclick="@(async () => await js.InvokeVoidAsync("InitiateImageUpload", 7))">
+                                                    Upload
+                                                </button>
+                                            </div>
+                                            <div class="file-upload-content">
+
+                                                <div class="image-title-wrap">
+                                                    <button type="button" onclick="removeUpload('file')" class="remove-image">Remove</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg">
+                                        <div class="form-group">
+                                            <input @bind="@currentwebsite.desc" type="text" placeholder="Description" class="form-control"   autocomplete="off" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <input @bind="@currentwebsite.avgvisitors" type="text" placeholder="Visitors" class="form-control"   autocomplete="off" />
+                                        </div>
+                                        <div class="form-group">
+                                            <input @bind="@currentwebsite.avgusers" type="text" placeholder="Registered users" class="form-control"  autocomplete="off" />
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row auto-post mb-3">
+
+                                                <div class="col-auto">
+                                                    <div class="material-switch pull-right">
+                                                        <input @onchange="@((args) => { currentwebsite.verificationtype = (bool)args.Value ? 1 : 2; })" id="someSwitchOptionDefault" name="someSwitchOption001" type="checkbox" value="@(currentwebsite.verificationtype == 1 ? "false" : "true")" />
+                                                        <label for="someSwitchOptionDefault" class="label-default"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col pl-0"><label class="pt-1">Auto Post</label></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row table-website ml-0 mr-0">
+                                    <div class="col-12">
+                                        <div class="row">
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center pt-4">
+
+                                <h3>Modify Website</h3>
+                                <a class="GenericVendoButton" @onclick="@(async () => await UpdateSite())">Update</a>
+
+
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <div class="col pb-3 website-middle br-1">
+                                    <a class="btn-orange mb-2">DNS</a><br />
+                                    <span>Create new text record for your domain</span><br />
+                                    <span>Name:</span>
+                                    <br />
+                                    <span>mdwebverify</span>
+                                    <br />
+                                    <span>Record:</span>
+                                    <br />
+                                    <span>@currentverificationcode</span>
+                                </div>
+                                <div class="col pb-3 website-middle">
+                                    <a class="btn-orange mb-2">HTML</a><br /><span>Insert the following line in your HTML on your landing page:</span>
+                                    <br />
+                                    <span>@currentverificationhtml</span>
+                                    <br />
+                                    <span></span>
+                                </div>
+                                <p><a class="GenericVendoButton" @onclick="@(async () => await TryVerify())">Submit</a></p>
+                            </div>
+                        }
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+            @if (currentwebsite != null)
+            {
+                <div class="col-xl col-lg-6">
+                    <h3>Select Containers</h3>
+                    <div class="campaign-table">
+                        <div class="banner-select">
+                            @if (c1.status == false)
+                            {
+                                <a class="banner-1" style="@(containertypeselected == 1 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 1; } )">160x600</a>
+                            }
+                            else
+                            {
+                                <a style="background-color:#00ff21;@(containertypeselected == 1 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 1; } )" class="banner-1">160x600</a>
+                            }
+                            @if (c2.status == false)
+                            {
+                                <a class="banner-2" style="@(containertypeselected == 2 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 2; } )">320x250</a>
+                            }
+                            else
+                            {
+                                <a style="background-color:#00ff21;@(containertypeselected == 2 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 2; } )" class="banner-2">320x250</a>
+                            }
+                            @if (c3.status == false)
+                            {
+                                <a class="banner-3" style="@(containertypeselected == 3 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 3; } )">300x600</a>
+                            }
+                            else
+                            {
+                                <a style="background-color:#00ff21;@(containertypeselected == 3 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 3; } )" class="banner-3">300x600</a>
+                            }
+                            @if (c4.status == false)
+                            {
+                                <a class="banner-4" style="@(containertypeselected == 4 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 4; } )">728x90</a>
+                            }
+                            else
+                            {
+                                <a style="background-color:#00ff21;@(containertypeselected == 4 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 4; } )" class="banner-4">728x90</a>
+                            }
+                            @if (c5.status == false)
+                            {
+                                <a class="banner-5" style="@(containertypeselected == 5 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 5; } )">640x640</a>
+                            }
+                            else
+                            {
+                                <a style="background-color:#00ff21;@(containertypeselected == 5 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 5; } )" class="banner-5">300x50</a>
+                            }
+                            @if (c6.status == false)
+                            {
+                                <a class="banner-6" style="@(containertypeselected == 6 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 6; } )">320x50</a>
+                            }
+                            else
+                            {
+                                <a style="background-color:#00ff21;@(containertypeselected == 6 ? "border:1px #ffffff solid; color: #ffffff !important;" : "")" @onclick="@(() => { containertypeselected = 6; } )" class="banner-6">320x50</a>
+                            }
+
+
+
+                        </div>
+
+                        <hr />
+
+                        <div class="form-group">
+                            <div class="row auto-post mb-3">
+                                <div class="col"><label class="pt-1">On/Off</label></div>
+                                <div class="col-auto pl-0">
+                                    <div class="material-switch pull-right">
+                                        @if (containertypeselected == 1)
+                                        {
+                                            @if (c1.status == false)
+                                            {
+                                                <input id="switch1" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch1" type="checkbox" value="false" />
+                                                <label for="switch1" class="label-default"></label>
+                                            }
+                                            else
+                                            {
+                                                <input id="switch1" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch1" type="checkbox" checked="checked" />
+                                                <label for="switch1" class="label-default"></label>
+                                            }
+                                        }
+                                        @if (containertypeselected == 2)
+                                        {
+                                            @if (c2.status == false)
+                                            {
+                                                <input id="switch2" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch2" type="checkbox" value="false" />
+                                                <label for="switch2" class="label-default"></label>
+                                            }
+                                            else
+                                            {
+                                                <input id="switch2" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch2" type="checkbox" checked="checked" />
+                                                <label for="switch2" class="label-default"></label>
+                                            }
+                                        }
+                                        @if (containertypeselected == 3)
+                                        {
+                                            @if (c3.status == false)
+                                            {
+                                                <input id="switch3" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch3" type="checkbox" value="false" />
+                                                <label for="switch3" class="label-default"></label>
+                                            }
+                                            else
+                                            {
+                                                <input id="switch3" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch3" type="checkbox" checked="checked" />
+                                                <label for="switch3" class="label-default"></label>
+                                            }
+                                        }
+                                        @if (containertypeselected == 4)
+                                        {
+                                            @if (c4.status == false)
+                                            {
+                                                <input id="switch4" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch4" type="checkbox" value="false" />
+                                                <label for="switch4" class="label-default"></label>
+                                            }
+                                            else
+                                            {
+                                                <input id="switch4" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch4" type="checkbox" checked="checked" />
+                                                <label for="switch4" class="label-default"></label>
+                                            }
+                                        }
+                                        @if (containertypeselected == 5)
+                                        {
+                                            @if (c5.status == false)
+                                            {
+                                                <input id="switch5" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch5" type="checkbox" value="false" />
+                                                <label for="switch5" class="label-default"></label>
+                                            }
+                                            else
+                                            {
+                                                <input id="switch5" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch5" type="checkbox" checked="checked" />
+                                                <label for="switch5" class="label-default"></label>
+                                            }
+                                        }
+                                        @if (containertypeselected == 6)
+                                        {
+
+
+                                            @if (c6.status == false)
+                                            {
+                                                <input id="switch6" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch6" type="checkbox" value="false" />
+                                                <label for="switch6" class="label-default"></label>
+                                            }
+                                            else
+                                            {
+                                                <input id="switch6" @onchange="@(async (args) => await ChangeContainerStatus(Convert.ToBoolean(args.Value)))" name="switch6" type="checkbox" checked="checked" />
+                                                <label for="switch6" class="label-default"></label>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group bannercode">
+                            <p style="color:#ffffff">JS/HTML integration</p>
+                            @if (containertypeselected == 1)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@(" <img id=\"md_displayad_"+ c1.id+"\"  /> <script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script>")
+</textarea>
+                            }
+                            @if (containertypeselected == 2)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<img id=\"md_displayad_"+ c2.id+"\"    /> <script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> ")
+</textarea>
+                            }
+                            @if (containertypeselected == 3)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<img id=\"md_displayad_"+ c3.id+"\"    /> <script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> ")
+</textarea>
+                            }
+                            @if (containertypeselected == 4)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<img id=\"md_displayad_"+ c4.id+"\"    /> <script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> ")
+</textarea>
+                            }
+                            @if (containertypeselected == 5)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<img id=\"md_displayad_"+ c5.id+"\"   /> <script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> ")
+</textarea>
+                            }
+                            @if (containertypeselected == 6)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<img id=\"md_displayad_"+ c6.id+"\"    /> <script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> ")
+</textarea>
+                            }
+
+                        </div>
+
+                        <div class="form-group bannercode">
+                            <p style="color:#ffffff">IFrame integration</p>
+                            @if (containertypeselected == 1)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+ c1.id+"\"  onclick=\"vendoads.click(this);\" />")
+</textarea>
+                            }
+                            @if (containertypeselected == 2)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+ c2.id+"\"  onclick=\"vendoads.click(this);\" />")
+</textarea>
+                            }
+                            @if (containertypeselected == 3)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+ c3.id+"\"  onclick=\"vendoads.click(this);\" />")
+</textarea>
+                            }
+                            @if (containertypeselected == 4)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+ c4.id+"\"  onclick=\"vendoads.click(this);\" />")
+</textarea>
+                            }
+                            @if (containertypeselected == 5)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+ c5.id+"\"  onclick=\"vendoads.click(this);\" />")
+</textarea>
+                            }
+                            @if (containertypeselected == 6)
+                            {
+                                <textarea class="form-control" id="bannercode" rows="7" readonly=readonly>
+@("<script src=\"https://click.vendo.media/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+ c6.id+"\"  onclick=\"vendoads.click(this);\" />")
+</textarea>
+                            }
+
+                        </div>
+
+                        <div class="form-group bannercode">
+                            <p style="color:#ffffff">Blazor integration</p>
+                            <p style="color:#ffffff">&bull; Place the JavaScript tag (from js integration) in your primary html file</p>
+                            <p style="color:#ffffff">&bull; Place the image tags where you want your ads to appear</p>
+                            <p style="color:#ffffff">&bull; On each page and component where you have the ads, use the following code</p>
+                            <p style="color:#ffffff">
+                                <code>
+                                    protected override async Task OnAfterRenderAsync(bool firstRender)
+                                    {
+
+                                    await js.InvokeVoidAsync("vendoads.refreshads");
+
+
+                                    }
+                                </code>
+                            </p>
+                        </div>
+
+                        <div class="form-group bannercode">
+                            <p style="color:#ffffff">Customize</p>
+                            <p style="color:#ffffff">&bull; You may execute vendoads.refreshads function, in case you need to refresh the ads</p> 
+                           
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+
+
+            <div class="col-xl col-lg-6">
+                <p style="color:#ffffff">Loading..</p>
+            </div>
+            }
+    </div>
+
+
+    </div>
+}
+
+@code {
+    bool isloading = false;
+    string currentverificationcode = "";
+    string currentverificationhtml = "";
+
+    string copypastebox = "<script src=\"http://click.mashdrop.com/libs/mdwebclicks/v1.js\" ></script> <img id=\"md_displayad_"+"\"  onclick=\"mashdropwebads.click(this);\" />";
+
+    int selected_category = 1;
+    string selected_category_name = "Fashion/Beauty";
+
+    string selected_websiteid = "";
+
+    Dictionary<string, string> selectedstyle = new Dictionary<string, string>();
+
+
+
+    //errors
+    string containersetupmessage = "";
+    string verifyerror;
+
+    GeneralModels.Influencer.Websites.GeneralFormObject currentwebsite = new GeneralModels.Influencer.Websites.GeneralFormObject();
+
+    List<GeneralModels.Influencer.Websites.AllWebsitesObject> FetchedWebsites;
+
+    void SetSearchCategory(int newcat, string newcategoryname)
+    {
+        currentwebsite.cat = newcat;
+        selected_category_name = newcategoryname;
+    }
+
+    #region containerdata
+
+    GeneralModels.Influencer.Websites.ContainerData c1 = new GeneralModels.Influencer.Websites.ContainerData();
+    GeneralModels.Influencer.Websites.ContainerData c2 = new GeneralModels.Influencer.Websites.ContainerData();
+    GeneralModels.Influencer.Websites.ContainerData c3 = new GeneralModels.Influencer.Websites.ContainerData();
+    GeneralModels.Influencer.Websites.ContainerData c4 = new GeneralModels.Influencer.Websites.ContainerData();
+    GeneralModels.Influencer.Websites.ContainerData c5 = new GeneralModels.Influencer.Websites.ContainerData();
+    GeneralModels.Influencer.Websites.ContainerData c6 = new GeneralModels.Influencer.Websites.ContainerData();
+
+    #endregion
+
+    [Parameter]
+    public string IdToSelect { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        FetchedWebsites = await GeneralLogic.Influencer.Websites.WebsitesManagement.GetWebsites();
+
+        if (FetchedWebsites.Count != 0)
+        {
+
+            //currentwebsite = await GeneralLogic.Influencer.Websites.WebsitesManagement.GetGeneralWebsiteListingDetails(FetchedWebsites[0].id);
+            /* selectedstyle.Clear();
+             foreach (var item in FetchedWebsites)
+             {
+                 selectedstyle.Add(item.id, "");
+             }*/
+            if (IdToSelect != "")
+            {
+                await SelectWebsite(FetchedWebsites.Find(x => x.id == IdToSelect).id);
+            }else
+            {
+                await SelectWebsite(FetchedWebsites[0].id);
+            }
+
+        }
+
+    }
+
+
+
+    async Task UpdateSite()
+    {
+        await GeneralLogic.Influencer.Websites.WebsitesManagement.UpdateGeneralListingDetails(selected_websiteid,
+            currentwebsite.desc, currentwebsite.cat, currentwebsite.sturl, currentwebsite.avgusers,
+            currentwebsite.avgvisitors, currentwebsite.logoid);
+
+    }
+
+    int containertypeselected = 1;
+    async Task ChangeContainerStatus(bool newvalue)
+    {
+        Console.WriteLine(selected_websiteid);
+        if (!newvalue)
+        {
+            await SwitchContainerOff(containertypeselected);
+        }
+        else
+        {
+            await SwitchContainerOn(containertypeselected);
+        }
+
+    }
+
+    async Task SwitchContainerOn(int container)
+    {
+
+        string code = await GeneralLogic.Influencer.Websites.WebsitesManagement.TurnOnWebsiteContainer(selected_websiteid, container);
+        if (code == "")
+        {
+            return;
+        }
+        switch (container)
+        {
+            case 1:
+                c1.id = code;
+                c1.sizeindex = 1;
+                c1.status = true;
+                break;
+            case 2:
+                c2.id = code;
+                c2.sizeindex = 2;
+                c2.status = true;
+                break;
+            case 3:
+                c3.id = code;
+                c3.sizeindex = 3;
+                c3.status = true;
+                break;
+            case 4:
+                c4.id = code;
+                c4.sizeindex = 4;
+                c4.status = true;
+                break;
+            case 5:
+                c5.id = code;
+                c5.sizeindex = 5;
+                c5.status = true;
+                break;
+            case 6:
+                c6.id = code;
+                c6.sizeindex = 6;
+                c6.status = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    async Task SwitchContainerOff(int container)
+    {
+
+        int rsp = await GeneralLogic.Influencer.Websites.WebsitesManagement.TurnOffWebsiteContainer(selected_websiteid, container);
+
+        if (rsp != 0)
+        {
+            containersetupmessage = "Unable to turn off";
+        }
+
+        switch (container)
+        {
+            case 1:
+                c1.id = "";
+                c1.sizeindex = 1;
+                c1.status = false;
+                break;
+            case 2:
+                c2.id = "";
+                c2.sizeindex = 2;
+                c2.status = false;
+                break;
+            case 3:
+                c3.id = "";
+                c3.sizeindex = 3;
+                c3.status = false;
+                break;
+            case 4:
+                c4.id = "";
+                c4.sizeindex = 4;
+                c4.status = false;
+                break;
+            case 5:
+                c5.id = "";
+                c5.sizeindex = 5;
+                c5.status = false;
+                break;
+            case 6:
+                c6.id = "";
+                c6.sizeindex = 6;
+                c6.status = false;
+                break;
+            default:
+                break;
+        }
+    }
+
+
+
+    async Task SelectWebsite(string id)
+    {
+        isloading = true;
+
+        try
+        {
+
+
+
+
+            selected_websiteid = id;
+            currentwebsite = await GeneralLogic.Influencer.Websites.WebsitesManagement.GetGeneralWebsiteListingDetails(id);
+            selected_category = currentwebsite.cat;
+            if (currentwebsite.status == 4)
+            {
+                var code = await GeneralLogic.Influencer.Websites.WebsitesManagement.GetVerificationData(id);
+                currentverificationcode = code.code;
+                currentverificationhtml = "<meta name=\"mashdropwebsiteverify\" vercode=\"" + code.code + "\" />";
+            }
+            var containers = await GeneralLogic.Influencer.Websites.WebsitesManagement.GetWebsiteContainers(id);
+            containers = containers.OrderBy(x => x.sizeindex).ToList();
+            c1 = new GeneralModels.Influencer.Websites.ContainerData() { status = false };
+            c2 = new GeneralModels.Influencer.Websites.ContainerData() { status = false };
+            c3 = new GeneralModels.Influencer.Websites.ContainerData() { status = false };
+            c4 = new GeneralModels.Influencer.Websites.ContainerData() { status = false };
+
+            c5 = new GeneralModels.Influencer.Websites.ContainerData() { status = false };
+            c6 = new GeneralModels.Influencer.Websites.ContainerData() { status = false };
+
+
+
+            foreach (var item in containers)
+            {
+                switch (item.sizeindex)
+                {
+                    case 1:
+                        c1 = item;
+                        break;
+                    case 2:
+                        c2 = item;
+                        break;
+                    case 3:
+                        c3 = item;
+                        break;
+                    case 4:
+                        c4 = item;
+                        break;
+                    case 5:
+                        c5 = item;
+                        break;
+                    case 6:
+                        c6 = item;
+                        break;
+                     
+                    default:
+                        break;
+                }
+            }
+            /* if (containers.Count >= 1)
+             {
+                 c1 = containers[0];
+             }
+
+             if (containers.Count >= 2)
+             {
+                 c2 = containers[1];
+             }
+
+             if (containers.Count >= 3)
+             {
+                 c3 = containers[2];
+             }
+
+             if (containers.Count >= 4)
+             {
+                 c4 = containers[3];
+             }
+
+             if (containers.Count >= 5)
+             {
+                 c5 = containers[4];
+             }
+
+             if (containers.Count >= 6)
+             {
+                 c6 = containers[5];
+             }*/
+
+
+
+        }
+        catch (Exception e)
+        {
+
+            Console.WriteLine(e.Message);
+            isloading = false;
+        }
+
+        isloading = false;
+    }
+
+    async Task UploadImageFile()
+    {
+        currentwebsite.logoid = await js.InvokeAsync<string>("UploadListingImage", "listinglogofilepicker");
+
+    }
+
+    async Task TryVerify()
+    {
+        int rsp = await GeneralLogic.Influencer.Websites.WebsitesManagement.VerifyWebsite(selected_websiteid);
+        if (rsp == 1)
+        {
+
+            await SelectWebsite(selected_websiteid);
+        }
+        else
+        {
+            verifyerror = "Unable to verify";
+        }
+
+    }
+
+}

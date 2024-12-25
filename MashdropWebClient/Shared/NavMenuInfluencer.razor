@@ -1,0 +1,65 @@
+﻿
+    <div class="row justify-content-end topbar-new">
+
+        <div class="col-auto header-account">
+            @*<span>CA balance:  <strong>$</strong></span>*@
+        </div>
+
+        <div class="col-auto notification">
+            <a href="/messagecenterpage">
+                <div class="row">
+                    <div class="col-auto not-border">
+                        <span class="notification-number">@messagecount</span>
+                        <i class="far fa-bell bell-icon" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="col-auto not-border d-sm-inline-block d-none" style="width:450px !important"><p style="width:450px !important">@messagefordisplay_title</p><p style="width:450px !important">@messagefordisplay_message</p></div>
+                    
+                </div>
+            </a>
+        </div>
+
+        <div class="col-auto pl-0 pr-0">
+            <div class="nav-profile dropdown pl-3">
+
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" id="profileDropdown">
+                        
+                        <span class="nav-profile-name"> </span><i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item" href="#"><i class="fas fa-user-circle"></i> Profile</a>
+                        <a class="dropdown-item" href="/financial/payoutpage"><i class="fas fa-wallet"></i> Payouts</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a class="dropdown-item" @onclick="@(async () => await SwitchUserTypes.InvokeAsync(1))"><i class="fas fa-unlock-alt"></i> To advertiser</a>
+                        <a class="dropdown-item border-bottom-0" @onclick="@(async () => await OnLogout.InvokeAsync(null))"><i class="fas fa-power-off"></i> Logout</a>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+@code {
+
+       
+     [Parameter]
+    public int messagecount { get; set; }
+
+    [Parameter]
+    public string messagefordisplay_title { get; set; }
+
+    [Parameter]
+    public string messagefordisplay_message { get; set; }
+
+    [Parameter]
+    public EventCallback<int> SwitchUserTypes { get; set; }
+
+    [Parameter]
+    public EventCallback<object> OnLogout { get; set; }
+}

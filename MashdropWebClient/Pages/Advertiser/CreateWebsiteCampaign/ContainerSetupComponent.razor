@@ -1,0 +1,499 @@
+﻿@inject IJSRuntime js
+
+<div class="addweb-headline">
+    <div class="step-check">3</div> <h2>Select Container</h2>
+</div>
+
+<div class="form-table">
+    @if (currentwebsite != null)
+    {
+    <div class="row container-select">
+
+        @if (c1_available)
+        {
+        <div class="col-md-4 banner-file-select">
+            <label class="w-100 text-center">160x600</label>
+            <div class="file-upload">
+                <div class="image-upload-wrap" id="wrapimage160" style="width:80px; height:300px;border:1px solid #ffffff !important">
+                    @if (currentwebsite.containers.c1.mediaid != "")
+                    {
+                        <img class="file-upload-image" id="image160" src="https://api.vendo.media/WebsiteAdvertsMedia?id=@currentwebsite.containers.c1.mediaid" alt="your image" height="300" width="80" />
+                    }
+                    else
+                    {
+                        <input class="file-upload-input" type='file' @onchange="@(async () => await UploadImage(1))" id="filepicker1" accept="image/*" />
+                    }
+
+
+
+                </div>
+                <div class="file-upload-content" id="contentimage160">
+                    
+                    
+                    <div class="image-title-wrap">
+                       
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 text-center">
+                @if (currentwebsite.containers.c1.id != "")
+                {
+                    <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(1))">Remove</button>
+                }
+                @if (currentwebsite.containers.c1.id == "")
+                {
+                    <a class="btn-big btn-green" onclick="document.getElementById('filepicker1').click();">Add Image</a>
+                }
+                <p style="color:#ff0000">@c1_error</p>
+            </div>
+        </div>
+        }
+
+
+        @if (c2_available)
+        {
+        <div class="col-md-4 banner-file-select">
+            <label class="w-100 text-center">320x250</label>
+            <div class="file-upload">
+                <div class="image-upload-wrap" id="wrapimage320" style="width:160px; height:125px;">
+                    @if (currentwebsite.containers.c2.mediaid != "")
+                    {
+                        <img class="file-upload-image" src="https://api.vendo.media/WebsiteAdvertsMedia?id=@currentwebsite.containers.c2.mediaid" id="image320" alt="your image" height="125" width="160" />
+
+                    }
+                    else
+                    {
+                        <input class="file-upload-input" type='file' @onchange="@(async () => await UploadImage(2))" id="filepicker2" accept="image/*" />
+                    }
+                </div>
+                <div class="file-upload-content" id="contentimage320">
+                   
+                    <div class="image-title-wrap">
+                        @if (currentwebsite.containers.c2.id != "")
+                        {
+                            <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(2))">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 text-center">
+                @if (currentwebsite.containers.c2.id != "")
+                {
+                    <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(2))">Remove</button>
+                }
+                @if (currentwebsite.containers.c2.id == "")
+                {
+                    <a class="btn-big btn-green" onclick="document.getElementById('filepicker2').click();">Add Image</a>
+                }
+                <p style="color:#ff0000">@c2_error</p>
+            </div>
+        </div>
+        }
+
+        @if (c3_available)
+        {
+        <div class="col-md-4 banner-file-select">
+            <label class="w-100 text-center">300x600</label>
+            <div class="file-upload">
+                <div class="image-upload-wrap" id="wrapimage300" style="width:150px; height:300px;">
+                    @if (currentwebsite.containers.c3.mediaid != "")
+                    {
+                        <img class="file-upload-image" id="image300" src="https://api.vendo.media/WebsiteAdvertsMedia?id=@currentwebsite.containers.c3.mediaid" alt="your image" height="300" width="150" />
+                    }
+                    else
+                    {
+                        <input class="file-upload-input" type='file' id="filepicker3" @onchange="@(async () => await UploadImage(3))" accept="image/*" />
+                    }
+
+                </div>
+                <div class="file-upload-content" id="contentimage300">
+                   
+                    <div class="image-title-wrap">
+                        @if (currentwebsite.containers.c3.id != "")
+                        {
+                            <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(3))">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 text-center">
+                @if (currentwebsite.containers.c3.id != "")
+                {
+                    <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(3))">Remove</button>
+                }
+                @if (currentwebsite.containers.c3.id == "")
+                {
+                    <a class="btn-big btn-green" onclick="document.getElementById('filepicker3').click();">Add Image</a>
+                }
+                <p style="color:#ff0000">@c3_error</p>
+            </div>
+
+        </div>
+         }
+
+
+        @if (c4_available)
+        {
+        <div class="col-md-12 banner-file-select">
+            <label class="w-100 text-center">728x90</label>
+            <div class="file-upload">
+                <div class="image-upload-wrap" id="wrapimage728" style="width:364px; height:45px;">
+                    @if (currentwebsite.containers.c4.mediaid != "")
+                    {
+                        <img class="file-upload-image" id="image728" src="https://api.vendo.media/WebsiteAdvertsMedia?id=@currentwebsite.containers.c4.mediaid" alt="your image" height="45" width="364" />
+
+                    }
+                    else
+                    {
+                        <input class="file-upload-input" type='file' id="filepicker4" @onchange="@(async () => await UploadImage(4))" accept="image/*" />
+                    }
+                </div>
+                <div class="file-upload-content" id="contentimage728">
+                   
+                    <div class="image-title-wrap">
+
+                        @if (currentwebsite.containers.c4.id != "")
+                        {
+                            <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(4))">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 text-center">
+                @if (currentwebsite.containers.c4.id != "")
+                {
+                    <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(4))">Remove</button>
+                }
+                @if (currentwebsite.containers.c4.id == "")
+                {
+                    <a class="btn-big btn-green" onclick="document.getElementById('filepicker4').click();">Add Image</a>
+                }
+                <p style="color:#ff0000">@c4_error</p>
+            </div>
+
+        </div>
+        }
+
+        @if (c5_available)
+        {
+        <div class="col-md-4 banner-file-select">
+            <label class="w-100 text-center">640x640</label>
+            <div class="file-upload">
+                <div class="image-upload-wrap" id="wrapimage3002" style="width:150px; height:25px;">
+                    @if (currentwebsite.containers.c5.mediaid != "")
+                    {
+                        <img class="file-upload-image" id="image3002" src="https://api.vendo.media/WebsiteAdvertsMedia?id=@currentwebsite.containers.c5.mediaid" alt="your image" height="25" width="150" />
+                    }
+                    else
+                    {
+                        <input class="file-upload-input" type='file' id="filepicker5" @onchange="@(async () => await UploadImage(5))" accept="image/*" />
+                    }
+                </div>
+                <div class="file-upload-content" id="contentimage3002">
+                   
+                    <div class="image-title-wrap">
+                        @if (currentwebsite.containers.c5.id != "")
+                        {
+                            <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(5))">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 text-center">
+                @if (currentwebsite.containers.c5.id != "")
+                {
+                    <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(5))">Remove</button>
+                }
+                @if (currentwebsite.containers.c5.id == "")
+                {
+                    <a class="btn-big btn-green" onclick="document.getElementById('filepicker5').click();">Add Image</a>
+                }
+                <p style="color:#ff0000">@c5_error</p>
+            </div>
+
+        </div>
+        }
+
+        @if (c6_available)
+        {
+        <div class="col-md-4 banner-file-select">
+            <label class="w-100 text-center">320x50</label>
+            <div class="file-upload">
+                <div class="image-upload-wrap" id="wrapimage3203" style="width:160px; height:25px;">
+                    @if (currentwebsite.containers.c6.mediaid != "")
+                    {
+                        <img class="file-upload-image" id="image3203" src="https://api.vendo.media/WebsiteAdvertsMedia?id=@currentwebsite.containers.c6.mediaid" alt="your image" height="25" width="160" />
+                    }
+                    else
+                    {
+                        <input class="file-upload-input" type='file' id="filepicker6" @onchange="@(async () => await UploadImage(6))" accept="image/*" />
+                    }
+                </div>
+                <div class="file-upload-content" id="contentimage3203">
+                    
+                    <div class="image-title-wrap">
+                        @if (currentwebsite.containers.c6.id != "")
+                        {
+                            <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(6))">Remove</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-100 text-center">
+                @if (currentwebsite.containers.c6.id != "")
+                {
+                    <button type="button" class="remove-image" @onclick="@(async () => await RemoveImage(6))">Remove</button>
+                }
+                @if (currentwebsite.containers.c6.id == "")
+                {
+                    <a class="btn-big btn-green" onclick="document.getElementById('filepicker6').click();">Add Image</a>
+                }
+                <p style="color:#ff0000">@c6_error</p>
+            </div>
+
+        </div>
+        }
+    </div>
+    }else
+    {
+        <p>loading</p>
+    }
+
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string websiteid { get; set; }
+
+
+    GeneralModels.Advertiser.CreateCampaigns.Websites.DraftModel currentwebsite;
+
+
+    bool c1_available = false;
+    bool c2_available = false;
+    bool c3_available = false;
+    bool c4_available = false;
+    bool c5_available = false;
+    bool c6_available = false;
+
+
+    string c1_error = "";
+    string c2_error = "";
+    string c3_error = "";
+    string c4_error = "";
+    string c5_error = "";
+    string c6_error = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        currentwebsite =  await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.GetDraftWebsiteDetails(websiteid);
+        var av = await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.GetAvailableContainers(currentwebsite.id);
+        Console.WriteLine(currentwebsite.containers.c1.mediaid);
+        Console.WriteLine(currentwebsite.containers.c1.mediaid == null);
+        Console.WriteLine(currentwebsite.containers.c1 == null);
+        c1_available = false;
+        c2_available = false;
+        c3_available = false;
+        c4_available = false;
+        c5_available = false;
+        c6_available = false;
+
+        foreach (var item in av)
+        {
+            switch (item)
+            {
+                case 1:
+                    c1_available = true;
+                    break;
+                case 2:
+                    c2_available = true;
+                    break;
+                case 3:
+                    c3_available = true;
+                    break;
+                case 4:
+                    c4_available = true;
+                    break;
+                case 5:
+                    c5_available = true;
+                    break;
+                case 6:
+                    c6_available = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    async Task UploadImage(int ctp)
+    {
+        switch (ctp)
+        {
+            case 1:
+                currentwebsite.containers.c1.containertype = ctp;
+                currentwebsite.containers.c1.websiteid = currentwebsite.id;
+                currentwebsite.containers.c1.mediaid = await js.InvokeAsync<string>("UploadContainerImage", "filepicker1", ctp);
+                if (currentwebsite.containers.c1.mediaid == "a")
+                {
+                    currentwebsite.containers.c1.mediaid = "";
+                    c1_error = "Size must be 160x600";
+                    return;
+                }
+                if (currentwebsite.containers.c1.mediaid == "b")
+                {
+                    currentwebsite.containers.c1.mediaid = "";
+                    c1_error = "Image must me under 1mb";
+                    return;
+                }
+                currentwebsite.containers.c1.id = (string)(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertContainer(currentwebsite.containers.c1));
+                break;
+            case 2:
+                currentwebsite.containers.c2.containertype = ctp;
+                currentwebsite.containers.c2.websiteid = currentwebsite.id;
+                currentwebsite.containers.c2.mediaid = await js.InvokeAsync<string>("UploadContainerImage", "filepicker2", ctp);
+                Console.WriteLine(currentwebsite.containers.c2.mediaid);
+                if (currentwebsite.containers.c2.mediaid == "a")
+                {
+                    currentwebsite.containers.c2.mediaid = "";
+                    c2_error = "Size must be 320x250";
+                    return;
+                }
+                else if (currentwebsite.containers.c2.mediaid == "b")
+                {
+                    currentwebsite.containers.c2.mediaid = "";
+                    c2_error = "Image must me under 1mb";
+                    return;
+                }
+                else
+                {
+                    currentwebsite.containers.c2.id = (string)(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertContainer(currentwebsite.containers.c2));
+                }
+
+                
+                break;
+            case 3:
+                currentwebsite.containers.c3.containertype = ctp;
+                currentwebsite.containers.c3.websiteid = currentwebsite.id;
+                currentwebsite.containers.c3.mediaid = await js.InvokeAsync<string>("UploadContainerImage", "filepicker3", ctp);
+                if (currentwebsite.containers.c3.mediaid == "a")
+                {
+                    currentwebsite.containers.c3.mediaid = "";
+                    c3_error = "Size must be 300x600";
+                    return;
+                }
+                if (currentwebsite.containers.c3.mediaid == "b")
+                {
+                    currentwebsite.containers.c3.mediaid = "";
+                    c3_error = "Image must me under 1mb";
+                    return;
+                }
+                currentwebsite.containers.c3.id = (string)(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertContainer(currentwebsite.containers.c3));
+                break;
+            case 4:
+                currentwebsite.containers.c4.containertype = ctp;
+                currentwebsite.containers.c4.websiteid = currentwebsite.id;
+                currentwebsite.containers.c4.mediaid = await js.InvokeAsync<string>("UploadContainerImage", "filepicker4", ctp);
+                if (currentwebsite.containers.c4.mediaid == "a")
+                {
+                    currentwebsite.containers.c4.mediaid = "";
+                    c4_error = "Size must be 728x90";
+                    return;
+                }
+                if (currentwebsite.containers.c4.mediaid == "b")
+                {
+                    currentwebsite.containers.c4.mediaid = "";
+                    c4_error = "Image must me under 1mb";
+                    return;
+                }
+                currentwebsite.containers.c4.id = (string)(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertContainer(currentwebsite.containers.c4));
+                break;
+            case 5:
+                currentwebsite.containers.c5.containertype = ctp;
+                currentwebsite.containers.c5.websiteid = currentwebsite.id;
+                currentwebsite.containers.c5.mediaid = await js.InvokeAsync<string>("UploadContainerImage", "filepicker5", ctp);
+                if (currentwebsite.containers.c5.mediaid == "a")
+                {
+                    currentwebsite.containers.c5.mediaid = "";
+                    c5_error = "Size must be 300x50";
+                    return;
+                }
+                if (currentwebsite.containers.c5.mediaid == "b")
+                {
+                    currentwebsite.containers.c5.mediaid = "";
+                    c5_error = "Image must me under 1mb";
+                    return;
+                }
+                currentwebsite.containers.c5.id = (string)(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertContainer(currentwebsite.containers.c5));
+                break;
+            case 6:
+                currentwebsite.containers.c6.containertype = ctp;
+                currentwebsite.containers.c6.websiteid = currentwebsite.id;
+                currentwebsite.containers.c6.mediaid = await js.InvokeAsync<string>("UploadContainerImage", "filepicker6", ctp);
+                if (currentwebsite.containers.c6.mediaid == "a")
+                {
+                    currentwebsite.containers.c6.mediaid = "";
+                    c6_error = "Size must be 320x50";
+                    return;
+                }
+                if (currentwebsite.containers.c6.mediaid == "b")
+                {
+                    currentwebsite.containers.c6.mediaid = "";
+                    c6_error = "Image must me under 1mb";
+                    return;
+                }
+                currentwebsite.containers.c6.id = (string)(await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertContainer(currentwebsite.containers.c6));
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    async Task RemoveImage(int ctp)
+    {
+        switch (ctp)
+        {
+            case 1:
+                await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.DeleteContainer(currentwebsite.containers.c1.id,currentwebsite.containers.c1.containertype, currentwebsite.containers.c1.websiteid);
+                currentwebsite.containers.c1 = new GeneralModels.Advertiser.CreateCampaigns.Containers.container() { containertype = 1, websiteid = currentwebsite.id };
+                break;
+            case 2:
+                await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.DeleteContainer(currentwebsite.containers.c2.id,currentwebsite.containers.c2.containertype, currentwebsite.containers.c2.websiteid);
+                currentwebsite.containers.c2 = new GeneralModels.Advertiser.CreateCampaigns.Containers.container() { containertype = 2, websiteid = currentwebsite.id };
+                break;
+            case 3:
+                await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.DeleteContainer(currentwebsite.containers.c3.id,currentwebsite.containers.c3.containertype, currentwebsite.containers.c3.websiteid);
+                currentwebsite.containers.c3 = new GeneralModels.Advertiser.CreateCampaigns.Containers.container() { containertype = 3, websiteid = currentwebsite.id };
+                break;
+            case 4:
+                await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.DeleteContainer(currentwebsite.containers.c4.id,currentwebsite.containers.c4.containertype, currentwebsite.containers.c4.websiteid);
+                currentwebsite.containers.c4 = new GeneralModels.Advertiser.CreateCampaigns.Containers.container() { containertype = 4, websiteid = currentwebsite.id };
+                break;
+            case 5:
+                await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.DeleteContainer(currentwebsite.containers.c5.id,currentwebsite.containers.c5.containertype, currentwebsite.containers.c5.websiteid);
+                currentwebsite.containers.c5 = new GeneralModels.Advertiser.CreateCampaigns.Containers.container() { containertype = 5, websiteid = currentwebsite.id };
+                break;
+            case 6:
+                await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.DeleteContainer(currentwebsite.containers.c6.id,currentwebsite.containers.c6.containertype, currentwebsite.containers.c6.websiteid);
+                currentwebsite.containers.c6 = new GeneralModels.Advertiser.CreateCampaigns.Containers.container() { containertype = 6, websiteid = currentwebsite.id };
+                break;
+
+            default:
+                break;
+        }
+    }
+
+}

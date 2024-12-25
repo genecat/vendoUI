@@ -1,0 +1,193 @@
+﻿@page "/advertiser/createwebsitecampaignbegin"
+@using Newtonsoft.Json
+@inject NavigationManager nv
+
+    <div class="row inside-header header2 justify-content-between">
+        <div class="col-sm col-12">
+            <h1 class="mt-2"> CREATE CAMPAIGN</h1>
+        </div>
+        <div class="col-sm col-12">
+            <div class="col-auto text-right"><a class="GenericVendoButton" @onclick="@(async () => await BeginSearch())">Search</a></div>
+        </div>
+        <div class="col-12 col-sm-auto camp-sort cat-right">
+            <div class="dropdown dropdown-input unselect-cat">
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    @categoryname
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" style="color:#ffffff">
+                    <li @onclick="@(() => SetSearchCategory(1, "Fashion/Beauty"))"><label>Fashion/Beauty</label></li>
+                    <li @onclick="@(() => SetSearchCategory(2, "Travel/Lifestyle"))"><label>Travel/Lifestyle</label></li>
+                    <li @onclick="@(() => SetSearchCategory(3, "Celebrity/Entertainment"))"><label>Celebrity/Entertainment</label></li>
+                    <li @onclick="@(() => SetSearchCategory(4, "Sports"))"><label>Sports</label></li>
+                    <li @onclick="@(() => SetSearchCategory(5, "Gaming"))"><label>Gaming</label></li>
+                    <li @onclick="@(() => SetSearchCategory(6, "Health/Fitness"))"><label>Health/ Fitness</label></li>
+                    <li @onclick="@(() => SetSearchCategory(7, "Family/Home"))"><label>Family/Home</label></li>
+                    <li @onclick="@(() => SetSearchCategory(8, "Business"))"><label>Business</label></li>
+                    <li @onclick="@(() => SetSearchCategory(9, "Alternative Lifestyle"))"><label>Alternative Lifestyle</label></li>
+                    <li @onclick="@(() => SetSearchCategory(10, "Food/Cooking"))"><label>Food/Cooking</label></li>
+                    <li @onclick="@(() => SetSearchCategory(11, "Spiritual/Motivational"))"><label>Spiritual/Motivational</label></li>
+                    <li @onclick="@(() => SetSearchCategory(12, "Information/Education"))"><label>Information/Education</label></li>
+                    <li @onclick="@(() => SetSearchCategory(13, "Technology"))"><label>Technology</label></li>
+                    <li @onclick="@(() => SetSearchCategory(14, "Adult"))"><label>Adult</label></li>
+                </ul>
+            </div>
+        </div>
+
+
+
+        <hr class="sort-hr" />
+
+        <div class="search-keywords">
+            <div class="row">
+                @*<div class="col-auto">
+                    <div class="alert keyword alert-dismissible fade show" role="alert">
+                        Sport
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <div class="alert keyword alert-dismissible fade show" role="alert">
+                        10,000 - 20,000
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md col-12">
+                    <div class="sort-average">
+                        Average CPC <span>$0,65</span>
+                    </div>
+                </div>*@
+            </div>
+
+
+        </div>
+
+    </div>
+
+        <h5 class="form-headline w-100 mt-5 pl-4">
+            @*4 Influencer *@ @if (searchresults != null && searchresults.Count == 0)
+        {
+            <span>@searchresults.Count</span>
+        }
+        </h5>
+
+        <div class="row ml-2 mr-2 table-limit">
+
+
+            <div class="row ml-2 mr-2 table-limit mt-5 w-100">
+
+                @if (searchresults != null)
+                {
+
+                    foreach (var item in searchresults)
+                    {
+                        <SearchResultsItem @key="item" listingid="@item" OnSelect="@((args) => Add(args))"></SearchResultsItem>
+                    }
+
+                }
+                else
+                {
+                    <p style="color:#ffffff">No results</p>
+                }
+
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+        <div class="footer-step row pl-4" style="margin-top:90vh">
+            <div class="row pt-3 pb-3">
+                <div class="col-auto footer-select"><i class="fas fa-circle"></i> @selectedwebsites.Count Websites Selected</div>
+                <div class="col footer-websites text-left">
+
+                </div>
+                <div class="col-auto footer-websites text-left">Est. audience: <span>@estaudience</span></div>
+                <div class="col-auto footer-websites text-left">Est. average CPC:<span>@estavgcpc</span></div>
+                @if (is_loadingnext)
+                {
+                    <div class="col-auto text-right"><img src="buttonloader1.gif" /></div>
+                }
+                else
+                {
+                    <div class="col-auto text-right"><a class="btn-big btn-green" @onclick="@(async () => await ToNext())">Next</a></div>
+                }
+
+            </div>
+
+        </div>
+
+
+
+@code {
+    bool is_loadingnext = false;
+
+    List<string> searchresults;
+
+    Dictionary<string, string> selectedwebsites = new Dictionary<string, string>();
+
+    int estaudience = 0;
+    int estavgcpc = 0;
+
+    #region set search params
+
+
+    string categoryname = "Fashion/Beauty";
+
+    GeneralModels.Advertiser.CreateCampaigns.Websites.SearchParamModel SearchParams = new GeneralModels.Advertiser.CreateCampaigns.Websites.SearchParamModel() { cat = 1};
+
+    void SetSearchCategory(int newcat, string newcategoryname)
+    {
+        SearchParams.cat = newcat;
+        categoryname = newcategoryname;
+    }
+
+    #endregion
+
+    async Task BeginSearch()
+    {
+        searchresults = await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.StartSearchWebsites(SearchParams);
+    }
+
+
+    void Add(object[] listing)
+    {
+
+
+        if ((bool)listing[2])
+        {
+
+            selectedwebsites.Add((string)listing[0], (string)listing[1]);
+            estaudience += (int)listing[3];
+        }
+        else
+        {
+            selectedwebsites.Remove((string)listing[0]);
+            estaudience -= (int)listing[3];
+        }
+    }
+
+
+    async Task ToNext()
+    {
+        is_loadingnext = true;
+        string campaignid = await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertInitialCampaign();
+        var readysites = await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.InsertInitialWebsites(selectedwebsites,campaignid);
+        GeneralLogic.GeneralObjects.websitecampaigncreate.currentwebsites = readysites;
+        nv.NavigateTo("/advertiser/createwebsitecampaign/" +campaignid/*+"/"+estaudience.ToString()*/);
+
+    }
+}

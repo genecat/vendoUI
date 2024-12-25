@@ -1,0 +1,13 @@
+﻿@page  "/stripecheckout/{id}"
+@inject IJSRuntime js
+@layout EmptyLayout
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await js.InvokeAsync<string>("striperedirect", id);
+    }
+}

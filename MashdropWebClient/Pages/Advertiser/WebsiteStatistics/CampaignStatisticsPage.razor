@@ -1,0 +1,123 @@
+﻿@page "/advertiser/websitecampaignstatspage"
+@inject IJSRuntime js
+ 
+
+
+
+
+
+
+
+<div class="row inside-header header2" id="closeOnClick">
+    <div class="col-lg col-12">
+        <h1 class="mt-2"><i class="fas fa-eye"></i> OVERVIEW</h1>
+    </div>
+    <div class="col-12 col-md-auto form-group mb-0 pr-0">
+
+    </div>
+    <div class="col-12 col-md-auto form-group mb-0">
+
+    </div>
+
+</div>
+
+
+
+<div class="row inside-header header2 stats-header pt-0">
+    <hr class="sort-hr w-100 mt-0" />
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>3</span><br />Total Live Campaigns
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>0</span><br />Total Clicks
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>0</span><br />Total social clicks
+    </div>
+
+    <div class="col-xl-2 col-lg-4  col-sm-4">
+        <span>0</span><br />Total Website Clicks
+    </div>
+
+    <div class="col-xl-2 col-lg-4  col-sm-4">
+        <span>$0</span><br />Total Spent
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>$0</span><br />Something
+    </div>
+</div>
+
+
+
+
+
+
+<div class="container">
+
+    <div class="row stats-page">
+
+        <h5 class="form-headline head-white w-100 mt-5 pl-4"> </h5>
+
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pl-0 col">Total Clics</div>
+                    <div class="pr-0 col-auto">Last 24-Hours</div>
+                </div>
+                <div class="chart-table">
+                    <canvas id="chart1"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pl-0 col">Click Sources</div>
+                    <div class="pr-0 col-auto">Last 24-Hours</div>
+                </div>
+                <div class="chart-table">
+                    <canvas id="chart2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-12 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pr-0 col">Total Clics</div>
+                    <div class="col-auto">Last 7 Hours</div>
+                </div>
+                <div class="chart-table">
+                    <canvas id="chart3"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pr-0 col">Rate per Platform</div>
+                    <div class="col-auto">Last 24-Hours</div>
+                </div>
+
+
+                <div class="chart-table">
+                    <canvas id="chart4"></canvas>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+ 
+        </div>
+
+@code {
+
+    
+}

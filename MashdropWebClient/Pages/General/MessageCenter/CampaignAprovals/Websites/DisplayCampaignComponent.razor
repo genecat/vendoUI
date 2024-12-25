@@ -1,0 +1,224 @@
+﻿@using Newtonsoft.Json; 
+@if (thismessage != null && campaign != null)
+{
+
+
+    <div class="col-lg-6 col-md-12">
+        <div class="campaign-table step-table2">
+            <div class="campaign-headline headline2">
+                <div class="row">
+                    <div class="col-12 vmessage-image">
+                        <span>@campaign.title</span>
+
+                        <div class="campaign-preview mt-4">
+                            @if (displayedcontainer == 1)
+                            {
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@containers.c1.mediaid" class="img-fluid" />
+                            }
+                            @if (displayedcontainer == 2)
+                            {
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@containers.c2.mediaid" class="img-fluid" />
+                            }
+                            @if (displayedcontainer == 3)
+                            {
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@containers.c3.mediaid" class="img-fluid" />
+                            }
+                            @if (displayedcontainer == 4)
+                            {
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@containers.c4.mediaid" class="img-fluid" />
+                            }
+                            @if (displayedcontainer == 5)
+                            {
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@containers.c5.mediaid" class="img-fluid" />
+                            }
+                            @if (displayedcontainer == 6)
+                            {
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@containers.c6.mediaid" class="img-fluid" />
+                            }
+                        </div>
+
+                        <div class="website-nav verfiy-message">
+                            <div class="website-prev"><i @onclick="@(async () => await Image_GoBack())" class="fa fa-chevron-left" aria-hidden="true"></i></div>
+                            <div class="website-next"><i @onclick="@(async () => await Image_GoForward())" class="fa fa-chevron-right" aria-hidden="true"></i></div>
+                        </div>
+                        <div class="message-bottom">
+                            <p class="mt-4 mb-2">@thismessage.mesage</p>
+                            <p style="color:white;">Target: <a href="@campaign.targeturl" target="_blank">@campaign.targeturl</a></p>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <hr class="hr-grey" />
+
+
+                <div class="row w-100 mt-3 justify-content-center pl-3">
+                    <div class="col-auto mb-2"><a class="btn-small btn-grey2 font-weight-light" @onclick="@(async () => await DeclineAsync())" >Decline</a></div>
+                    <div class="col-auto mb-2"><a class="btn-small btn-green font-weight-light" @onclick="@(async () => await ApproveAsync())" >Approve</a></div>
+                </div>
+
+                <div class="row w-100 mt-3 justify-content-center pl-3">
+                    <div class="col-auto mb-2">@decline_error</div>
+                    <div class="col-auto mb-2">@approve_error</div>
+                </div>
+
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+}
+
+
+
+
+@code {
+    [Parameter]
+    public GeneralModels.MessageCenter.MessageModel thismessage { get; set; }
+
+
+    string decline_error = "";
+    string approve_error = "";
+
+    metacontainers containers;
+    GeneralModels.Advertiser.Management.CampaignModel campaign;//.CampaignModel campaign;
+    metamodel currentmeta;
+
+    List<int> availablecontainers = new List<int>();
+    int displayedcontainer = 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //Console.WriteLine(thismessage.metadata);
+        var metadata =  JsonConvert.DeserializeObject<metamodel>(thismessage.metadata);
+        currentmeta = metadata;
+        containers = metadata.containers;
+        if (containers.c1.id != "")
+        {
+            availablecontainers.Add(1);
+        }
+        if (containers.c2.id != "")
+        {
+            availablecontainers.Add(2);
+        }
+        if (containers.c3.id != "")
+        {
+            availablecontainers.Add(3);
+        }
+
+        if (containers.c4.id != "")
+        {
+            availablecontainers.Add(4);
+        }
+
+        if (containers.c5.id != "")
+        {
+            availablecontainers.Add(5);
+        }
+
+        if (containers.c6.id != "")
+        {
+            availablecontainers.Add(6);
+        }
+        if (availablecontainers.Count != 0)
+        {
+            displayedcontainer = availablecontainers[0];
+        }
+
+        var campaigndata = await GeneralLogic.Advertiser.Statistics.WebsiteStatistics.GetCampaignDetails(metadata.campaignid);
+        campaign = campaigndata;
+    }
+
+    public class metamodel
+    {
+        public string listingid { get; set; }
+        public string campaignid { get; set; }
+        public metacontainers containers { get; set; }
+
+    }
+
+    public class metacontainers
+    {
+
+        public metacontainer c1 { get; set; }
+        public metacontainer c2 { get; set; }
+        public metacontainer c3 { get; set; }
+        public metacontainer c4 { get; set; }
+        public metacontainer c5 { get; set; }
+        public metacontainer c6 { get; set; }
+    }
+
+    public class metacontainer
+    {
+
+        public string listingid { get; set; }
+        public string id { get; set; }
+        public string mediaid { get; set; }
+    }
+
+
+
+    async Task DeclineAsync()
+    {
+        bool resp =   await GeneralLogic.Advertiser.CreateCampaigns.CampaignApprovals.DeclineCampaign(currentmeta.campaignid, currentmeta.listingid);
+        if (resp)
+        {
+            bool disresp = await GeneralLogic.MessageCenter.Manager.DismissMessage(thismessage.Id);
+            if (disresp)
+            {
+             await   OnDismiss.InvokeAsync(thismessage.Id);
+            }
+        }else
+        {
+            decline_error = "something went wrong";
+        }
+    }
+
+    async Task ApproveAsync()
+    {
+        bool resp =   await GeneralLogic.Advertiser.CreateCampaigns.CampaignApprovals.ApproveCampaign(currentmeta.campaignid, currentmeta.listingid);
+        if (resp)
+        {
+            bool disresp = await GeneralLogic.MessageCenter.Manager.DismissMessage(thismessage.Id);
+            if (disresp)
+            {
+             await   OnDismiss.InvokeAsync(thismessage.Id);
+            }
+        }else
+        {
+            approve_error = "something went wrong";
+        }
+    }
+
+    async Task Image_GoBack()
+    {
+        if (0 == availablecontainers.FindIndex(x => x == displayedcontainer))
+        {
+            displayedcontainer = availablecontainers[availablecontainers.Count];
+        }else
+        {
+            int currentposition = availablecontainers.FindIndex(x => x == displayedcontainer);
+            displayedcontainer = availablecontainers[currentposition - 1];
+        }
+    }
+
+    async Task Image_GoForward()
+    {
+        if (availablecontainers.Count == availablecontainers.FindIndex(x => x == displayedcontainer))
+        {
+            displayedcontainer = availablecontainers[0];
+        }else
+        {
+            int currentposition = availablecontainers.FindIndex(x => x == displayedcontainer);
+            displayedcontainer = availablecontainers[currentposition + 1];
+        }
+    }
+
+    [Parameter]
+    public EventCallback<string> OnDismiss { get; set; }
+}

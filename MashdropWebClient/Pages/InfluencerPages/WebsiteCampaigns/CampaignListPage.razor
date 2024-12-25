@@ -1,0 +1,51 @@
+﻿@page "/influencer/websitestatistics/campaignlistpage"
+@page "/influencer/overview"
+@using GeneralModels.Influencer.CampaignOverview;
+
+
+
+
+
+
+
+    <div class="row mt-4 table-limit2">
+
+
+
+        @if (Websites != null)
+        {
+            @foreach (var item in Websites)
+            {
+                @foreach (var item1 in item.Value)
+                {
+                    <CampaignListItemComponent DomainName="@item.Key" Website="@item1"></CampaignListItemComponent>
+                }
+
+            }
+        }
+
+
+    </div>
+
+@code {
+    Dictionary<string, List<CampaignWebsiteModel>> Websites;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RetrieveData();
+    }
+
+    async Task RetrieveData()
+    {
+        var userlistings = await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<List<WebsiteListingModel>>("/publisher/campaigndata/retrievelistingsforuser");
+
+        var tempdata = new  Dictionary<string, List<CampaignWebsiteModel>>();
+        foreach (var item in userlistings)
+        {
+            var websites = await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<List<CampaignWebsiteModel>>("/publisher/campaigndata/retrievewebsitesforlisting?websiteid=" + item.Id);
+            tempdata.Add(item.DomainName, websites);
+        }
+
+        Websites = tempdata;
+    }
+}

@@ -1,0 +1,210 @@
+﻿@inject NavigationManager navmanager
+@inject IJSRuntime js
+
+
+ 
+
+<div class="container-fluid table-limit">
+   
+
+
+        <div class="row step-header mt-5 mywebsites">
+
+           
+
+
+            <div class="col-xl col-lg-6">
+                 
+                <div class="campaign-table">
+                    <div class="row">
+                        
+                            <div class="col-12">
+                                <div class="form-group select-website scat">
+                                    <div class="dropdown dropdown-input">
+                                        <button class="btn btn-srcsub dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            @selected_category_name
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li @onclick="@(() => SetSearchCategory(1, "Fashion/Beauty"))"><label>Fashion/Beauty</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(2, "Travel/Lifestyle"))"><label>Travel/Lifestyle</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(3, "Celebrity/Entertainment"))"><label>Celebrity/Entertainment</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(4, "Sports"))"><label>Sports</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(5, "Gaming"))"><label>Gaming</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(6, "Health/Fitness"))"><label>Health/Fitness</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(7, "Family/Home"))"><label>Family/Home</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(8, "Business"))"><label>Business</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(9, "Alternative Lifestyle"))"><label>Alternative Lifestyle</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(10, "Food/Cooking"))"><label>Food/Cooking</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(11, "Spiritual/Motivational"))"><label>Spiritual/Motivational</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(12, "Information/Education"))"><label>Information/Education</label></li>
+                                            <li @onclick="@(() => SetSearchCategory(13, "technology"))"><label>technology</label></li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-lg" id="divresim">
+
+                                        <div class="file-upload">
+                                            <div class="image-upload-wrap">
+
+                                                @if (currentwebsite.logoid == null || currentwebsite.logoid == "")
+                                                {
+                                                    <input class="file-upload-input" type='file' id="listinglogofilepicker" @onchange="@(async () => await UploadImageFile())" accept="image/*" />
+                                                }
+                                                else
+                                                {
+                                                    <input class="file-upload-input" type='file' id="listinglogofilepicker" hidden="hidden" @onchange="@(async () => await UploadImageFile())" accept="image/*" />
+                                                }
+
+                                                @if (currentwebsite.logoid != null || currentwebsite.logoid != "")
+                                                {
+                                                    <img class="file-upload-image" height="400" width="450" src="https://api.vendo.media/download/websitelistinglogo?id=@currentwebsite.logoid" />
+                                                }
+                                            </div>
+                                            <div class="d-flex justify-content-center mt-3">
+                                                <button type="button" class="GenericVendoButton"
+                                                        @onclick="@(async () => await js.InvokeVoidAsync("InitiateImageUpload", 7))">
+                                                    Upload
+                                                </button>
+                                            </div>
+                                            <div class="file-upload-content">
+
+                                                <div class="image-title-wrap">
+                                                    <button type="button" onclick="removeUpload('file')" class="remove-image">Remove</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg">
+                                        <div class="form-group">
+                                            <input @bind="@currentwebsite.desc" type="text" placeholder="Description" class="form-control" id="username" autocomplete="off" />
+                                        </div>
+                                        
+                                            <div class="form-group">
+                                                <input @bind="@currentwebsite.wurl" type="text" placeholder="Website Domain" class="form-control" id="username" autocomplete="off" />
+                                            </div>
+                                        
+                                        <div class="form-group">
+                                            <input @bind="@currentwebsite.avgvisitors" type="text" placeholder="Visitors" class="form-control" id="username" autocomplete="off" />
+                                        </div>
+                                        <div class="form-group">
+                                            <input @bind="@currentwebsite.avgusers" type="text" placeholder="Registered users" class="form-control" id="username" autocomplete="off" />
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row auto-post mb-3">
+
+                                                <div class="col-auto">
+                                                    <div class="material-switch pull-right">
+                                                        <input @onchange="@((args) => { currentwebsite.verificationtype = (bool)args.Value ? 1 : 2; })" id="someSwitchOptionDefault" name="someSwitchOption001" type="checkbox" value="true" />
+                                                        <label for="someSwitchOptionDefault" class="label-default"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col pl-0"><label class="pt-1">Auto Post</label></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row table-website ml-0 mr-0">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            
+                                                <div class="col pb-3 website-middle br-1">
+                                                    <p>After you create your listing you will need to select it and verify it.</p>
+                                                </div>
+                                          
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center pt-4">
+                                
+                                    <a class="btn-big btn-green" @onclick="@(async () => await AddNewSite())">Submit</a>
+                               <label style="color:#ff0000;font-size:11px;">@publish_error</label>
+
+                            </div>
+
+                         
+                      
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+            
+        </div>
+     
+</div>
+
+@code {
+
+
+    int selected_category = 1;
+    string selected_category_name = "Fashion/Beauty";
+    string publish_error = "";
+
+    [Parameter]
+    public EventCallback<string> OnSubmitSuccess { get; set; }
+
+
+    GeneralModels.Influencer.Websites.GeneralFormObject currentwebsite = new GeneralModels.Influencer.Websites.GeneralFormObject();
+
+
+
+    void SetSearchCategory(int newcat, string newcategoryname)
+    {
+        currentwebsite.cat = newcat;
+        selected_category_name = newcategoryname;
+    }
+
+
+
+    async Task AddNewSite()
+    {
+
+        try
+        {
+
+
+            string id = await GeneralLogic.Influencer.Websites.WebsitesManagement.InsertWebsiteListing(currentwebsite);
+            if (id == "")
+            {
+
+                publish_error = "Something went wrong";
+                return;
+            }
+            else
+            {
+                await OnSubmitSuccess.InvokeAsync(id);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            publish_error = "Something went wrong";
+            throw;
+        }
+
+
+    }
+
+
+    async Task UploadImageFile()
+    {
+        currentwebsite.logoid = await js.InvokeAsync<string>("UploadListingImage", "listinglogofilepicker");
+
+    }
+
+
+
+}

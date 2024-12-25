@@ -1,0 +1,282 @@
+﻿
+@page "/registerpage"
+@inject NavigationManager Urihelper
+@layout EmptyLayout
+@inject IJSRuntime js
+
+
+<div class="topbar-login container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 logo-login text-center">
+            <label style="color:#4cff00;" >Vendo.media</label>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center alert-block" style="@alertdisplaymode">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading">Failed</h4>
+                <p>@alertmessage</p>
+                <hr />
+                <p class="mb-0"></p>
+                <button type="button" class="close" @onclick="@(() => { alertdisplaymode = "display:none;"; })" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9 col-sm-12">
+            <div class="form-table">
+                <div class="form-group">
+                    <label for="username">User details</label>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Full name</label>
+                        <input @bind="@userDetails.fullname" type="text" style="background-color:#ffffff !important;color:black !important" class="form-control" id="name"   />
+                    </div>
+
+                    <div class="form-group col-md-6">
+
+                        <label for="email">Email</label>
+                        <input type="email" @bind="@userDetails.email" style="background-color:#ffffff !important;color:black !important"  class="form-control" id="email"   />
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Phone</label>
+                    <input type="tel" id="phone"  @bind="@userDetails.phone" style="background-color:#ffffff !important;color:black !important"   class="form-control"    />
+                </div>
+
+                <div class="form-group">
+                   <label>Country</label>
+                   <BlazorCountryPicker.CountryPicker @ref="@cpicker"></BlazorCountryPicker.CountryPicker>
+                </div>
+                <div class="form-group">
+                    <label>Company details (not required)</label>
+                </div>
+                <div class="form-group">
+                    <label for="surname">Company</label>
+                    <input type="text" @bind="@userDetails.company" style="background-color:#ffffff !important;color:black !important"  class="form-control"   />
+                </div>
+                <div class="form-group">
+                    <label for="surname">Company id</label>
+                    <input type="text" @bind="@userDetails.companyid" style="background-color:#ffffff !important;color:black !important"  class="form-control"   />
+                </div>
+                <div class="form-group">
+                    <label for="surname">Company address</label>
+                    <input type="text" @bind="@userDetails.companyaddress"  style="background-color:#ffffff !important;color:black !important"  class="form-control"   />
+                </div>
+                <div class="form-group">
+                    @*  <label for="surname">Security</label>
+        <a class="btn-big btn-green" @onclick="@GeneratePassword">Generate password</a>
+         <label>  @generatedpassword</label>*@
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" @bind="@userDetails.password"  style="background-color:#ffffff !important;color:black !important"  class="form-control" id="password"   />
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmpass">Confirm Password</label>
+                    <input type="password" @bind="@repeatpassword"  style="background-color:#ffffff !important;color:black !important"  class="form-control" id="confirmpass"   />
+                </div>
+
+            </div>
+
+            <div class="form-group form-check pt-3">
+                <div class="custom-control custom-checkbox mb-2">
+                    <input @bind="@userDetails.consent_terms" type="checkbox"   class="custom-control-input" id="customCheck1" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck1">I agree with terms and conditions</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-2">
+                    <input @bind="@userDetails.consent_email" type="checkbox"   class="custom-control-input" id="customCheck2" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck2">I agree to receive communications over the email</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-2">
+                    <input @bind="@userDetails.consent_sms" type="checkbox"   class="custom-control-input" id="customCheck3" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck3">I agree to receive communications over SMS</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input @bind="@userDetails.consent_phone" type="checkbox"   class="custom-control-input" id="customCheck4" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck4">I agree to receive communications over a phone call</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-2 text-center"><a class="btn-big btn-green" @onclick="@Register">Sign Up</a></div>
+                <div class="col-12 text-center signup-link">
+                    Already have an account? <a href="/loginpage">Sign In</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- End page -->
+@code {
+    string generatedpassword = "";
+
+    string alertmessage;
+    string alertdisplaymode = "display:none;";
+    RegistrationUserDetails userDetails = new RegistrationUserDetails();
+    string repeatpassword = "";
+
+    BlazorCountryPicker.CountryPicker cpicker;
+
+    protected override   async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await   js.InvokeVoidAsync("openphoneplugin");
+       // await   js.InvokeVoidAsync("opencountryplugin");
+    }
+
+    async Task Register()
+    {
+        if (repeatpassword != userDetails.password)
+        {
+
+            alertmessage = "Password does not match";
+            alertdisplaymode = "display:inline;";
+            return;
+        }
+
+        if (!userDetails.consent_terms)
+        {
+            alertmessage = "You must agree to our terms";
+            alertdisplaymode = "display:inline;";
+            return;
+        }
+
+        userDetails.country = await cpicker.RetrieveCountryCodeAsync();
+
+        var output = await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("/Register", userDetails)).Content.ReadFromJsonAsync<RegistrationObject>();
+
+        if (output.Success == true)
+        {
+            Urihelper.NavigateTo("/verifiyemailpage/"+userDetails.email);
+        }
+        else
+        {
+            switch (output.Error)
+            {
+                case 1:
+                    if (output.PasswordError)
+                    {
+                        alertmessage = "Password too short";
+                        alertdisplaymode = "display:inline;";
+                    }
+                    if (output.EmailError == 1)
+                    {
+                        alertmessage = "Email already exists or the format is wrong";
+                        alertdisplaymode = "display:inline;";
+                    }
+                    if (output.EmailError == 2)
+                    {
+                        alertmessage = "Email already exists or the format is wrong";
+                        alertdisplaymode = "display:inline;";
+                    }
+                    break;
+                case 2:
+                    alertmessage = "Something went wrong, try again";
+                    alertdisplaymode = "display:inline;";
+                    break;
+                case 3:
+                    alertmessage = "Something went wrong, try again";
+                    alertdisplaymode = "display:inline;";
+                    break;
+                case 4:
+                    alertmessage = "Something went wrong, try again";
+                    alertdisplaymode = "display:inline;";
+                    break;
+                case 5:
+                    alertmessage = "Something went wrong, try again";
+                    alertdisplaymode = "display:inline;";
+                    break;
+                case 6:
+                    alertmessage = "Something went wrong, try again";
+                    alertdisplaymode = "display:inline;";
+                    break;
+                case 7:
+                    alertmessage = "Something went wrong, try again";
+                    alertdisplaymode = "display:inline;";
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    void GeneratePassword()
+    {
+        generatedpassword = "";
+        Random rnd = new Random();
+        char[] letterdic = new char[] { 'L', 'a', 'j', 'B', 'p', 'Z', 'X', 'Q', 'Y', 'F', 't', 'n', };
+        for (int i = 0; i < 10; i++)
+        {
+            int currentrand = rnd.Next(0, 10);
+            if (currentrand % 2 == 0)
+            {
+                generatedpassword += letterdic[currentrand];
+            }
+            else
+            {
+                generatedpassword += currentrand.ToString();
+            }
+        }
+    }
+
+    public class RegistrationUserDetails
+    {
+
+        public string email { get; set; }
+        public string password { get; set; }
+        public string country { get; set; } = "n/a";
+        public string company { get; set; } = "";
+        public string companyid { get; set; } = "";
+        public string companyaddress { get; set; } = "";
+        //representative
+        public string fullname { get; set; }
+        public string phone { get; set; } = "n/a";
+
+        public bool consent_terms { get; set; }
+        public bool consent_email { get; set; }
+        public bool consent_sms { get; set; }
+        public bool consent_phone { get; set; }
+    }
+
+    class RegistrationObject
+    {
+        public bool Success { get; set; }
+        public bool AutoAuthentication { get; set; }
+        public AuthObject Authentication { get; set; }
+        public int EmailError { get; set; }
+        public bool PasswordError { get; set; }
+        public int Error { get; set; }
+    }
+
+
+    public class AuthObject
+    {
+        public int Success { get; internal set; }
+        public string Id { get; internal set; }
+        public string Token { get; internal set; }
+        public int Error { get; internal set; }
+    }
+}

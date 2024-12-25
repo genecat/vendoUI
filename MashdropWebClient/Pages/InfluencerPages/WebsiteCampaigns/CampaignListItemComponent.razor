@@ -1,0 +1,209 @@
+﻿@using GeneralModels.Influencer.CampaignOverview;
+
+@if (DomainName != null)
+{
+    <div class="col-lg-6 col-md-12"  >
+        <div class="campaign-table step-table2">
+            <div class="campaign-headline headline2">
+
+
+                <div class="row campaign-detail pl-3">
+
+
+                    <div class="col-xl-6 col-lg-12 cmp-border">
+                        <span class="w-100 text-center pb-2 d-block">@(nameandtarget != null? nameandtarget.title : "")  (@DomainName)</span>
+                        <span class="w-100 text-center pb-2 d-block">Status: @generatenameforstatus(Website.Status)</span>
+                        @if (Containers != null && Containers.Count != 0)
+                        {
+                            <div class="website-nav">
+                                @if (Containers.Count != 1)
+                                {
+                                    <div class="website-prev"><i @onclick="@(async () => await ContainersToPrevious())" class="fa fa-chevron-left" aria-hidden="true"></i></div>
+                                    <div class="website-next"><i @onclick="@(async () => await ContainersToNext())" class="fa fa-chevron-right" aria-hidden="true"></i></div>
+                                }
+
+                            </div>
+                            <div class="campaign-preview">
+
+                                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@Containers[currentcontainerdisplayed].MediaId" class="img-fluid" />
+
+
+
+
+                            </div>
+                        }
+                    <span class="w-100 text-center pb-2 d-block">Target url: @(nameandtarget != null? nameandtarget.target : "")</span>
+                        <div class="row w-100 mt-3 justify-content-center pl-3">
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6 col-lg-12 mb-lg-3">
+                        @if (ContainerStats != null && ContainerStats.Values.Count !=0)
+                        {
+                            <div class="campaign-info row w-100 justify-content-between">
+                                <div class="col">Clicks</div>
+                                <div class="col-auto pl-0 pr-0"><span>@ContainerStats.Values.Sum(x => x.Clicks)</span></div>
+                            </div>
+                            <div class="campaign-info row w-100 justify-content-between">
+                                <div class="col">Impressions</div>
+                                <div class="col-auto pl-0 pr-0"><span>@ContainerStats.Values.Sum(x => x.Impressions)</span></div>
+                            </div>
+                            <div class="campaign-info row w-100 justify-content-between">
+                                <div class="col">Estimated earnings</div>
+                                <div class="col-auto pl-0 pr-0"><span>$@ContainerStats.Values.Sum(x => x.Earnings)</span></div>
+                            </div>
+                        }
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
+                <div class="row w-100 mt-3 justify-content-center pl-3">
+
+
+                </div>
+
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    [Parameter]
+    public string DomainName { get; set; }
+
+    [Parameter]
+    public CampaignWebsiteModel Website { get; set; }
+
+    List<CampaignContainerModel> Containers;
+
+
+    Dictionary<string, StatsForContainerModel> ContainerStats = new Dictionary<string, StatsForContainerModel>();
+
+    nameandtargetmodel nameandtarget;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            nameandtarget = await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<nameandtargetmodel>("/publisher/websitemanager/getcampaigndataforcampaignwebsite?wid=" +Website.Id);
+            Containers = await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<List<CampaignContainerModel>>("/publisher/campaigndata/retrievecontainersforwebsites?websiteid="+Website.Id);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message + " e1");
+        }
+        try
+        {
+            foreach (var item in Containers)
+            {
+                ContainerStats.Add(item.Id, await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<StatsForContainerModel>("/publisher/campaigndata/retrievestatsforcontainer?containerid="+item.Id));
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message+ " e2");
+        }
+    }
+
+
+    int currentcontainerdisplayed = 0;
+
+    Task ContainersToPrevious()
+    {
+        if (currentcontainerdisplayed == 0)
+        {
+            currentcontainerdisplayed = Containers.Count - 1;
+        }else
+        {
+            currentcontainerdisplayed--;
+        }
+        return Task.CompletedTask;
+    }
+
+    Task ContainersToNext()
+    {
+        if (currentcontainerdisplayed == Containers.Count - 1)
+        {
+            currentcontainerdisplayed = 0;
+        }else
+        {
+            currentcontainerdisplayed++;
+        }
+        return Task.CompletedTask;
+    }
+
+    public class nameandtargetmodel
+    {
+        public string title { get; set; }
+        public string target { get; set; }
+    }
+
+
+    string generatecolorforstatus(int status)
+    {
+        switch (status)
+        {
+
+            case 1:
+                return "border-top: 3px #23AF47 solid;";
+            case 2:
+                return "border-top: 3px #c40404 solid;";
+            case 3:
+                return "border-top: 3px #c40404 solid;";
+            case 4:
+                return "border-top: 3px #c40404 solid;";
+            case 5:
+                return "border-top: 3px #b5bd00 solid;";
+            case 6:
+                return "border-top: 3px #929292 solid;";
+            case 7:
+                return "border-top: 3px #929292 solid;";
+            default:
+                return "border-top: 3px #23AF47 solid;";
+        }
+    }
+
+
+    string generatenameforstatus(int status)
+    {
+        switch (status)
+        {
+
+            case 1:
+                return "Active";
+            case 2:
+                return "Completed";
+            case 3:
+                return "Suspended";
+            case 4:
+                return "Suspended";
+            case 5:
+                return "Paused";
+            case 6:
+                return "Declined";
+            case 7:
+                return "Awaiting verification";
+            case 8:
+                return "Declined";
+            default:
+                return "Draft";
+        }
+    }
+}

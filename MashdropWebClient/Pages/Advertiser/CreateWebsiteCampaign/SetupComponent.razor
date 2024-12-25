@@ -1,0 +1,233 @@
+﻿@inject IJSRuntime js
+
+<div class="row justify-content-between inside-header">
+    <div class="col-12">
+        <h1 class="mt-2"> CREATE CAMPAIGN</h1>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="row step-header mt-5 mb-5">
+
+
+        <div class="col-auto form-step-v"></div>
+        <div class="col-md col-lg-9 step-form-r">
+            <div class="addweb-headline">
+                <div class="step-check">1</div> <h2>Add Campaign Details</h2>
+            </div>
+
+            <div class="form-table">
+
+                <div class="form-group row">
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="staticEmail">Campaign Title</label>
+                            <input type="text" value="@title" class="form-control" @onchange="@(async (args) => { if (!completerender) return; await OnTitleChanged.InvokeAsync((string)args.Value); })" id="campname" />
+                         <p style="font-size:11px;color:#ff0000">@title_error</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="staticEmail">Campaign Budget</label>
+                            <input type="text" value="@Budget" class="form-control" @onchange="@(async (args) => { if (!completerender) return; await OnBudgetChanged.InvokeAsync(Convert.ToDouble((string)args.Value)); })" id="targetspend" placeholder="$"   />
+                             
+                            <p style="font-size:11px;color:#ff0000">@Budget_error</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="staticEmail">Daily Limit</label>
+                            <input type="text" value="@DailyBudget" class="form-control" id="dspend" @onchange="@(async (args) => { if (!completerender) return; await OnDailyBudgetChanged.InvokeAsync(Convert.ToDouble((string)args.Value)); })" placeholder="$" />
+                            
+                            <p style="font-size:11px;color:#ff0000">@DailyBudget_error</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group row">
+
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="staticEmail">Target URL</label>
+                            <input type="text" value="@Target" class="form-control input-100" id="targeturl" @onchange="@(async (args) => { if (!completerender) return; await OnTargetChanged.InvokeAsync((string)args.Value); })"   />
+                            <p style="font-size:11px;color:#ff0000">@Target_error</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                        <div class="form-group">
+                            <div class="input-group input-daterange">
+                                <label for="staticEmail">End Date</label>
+                                <BlazorDatePicker.DatePickerComponent OnDateChange="@(async (args) => await OnEndDateChanged.InvokeAsync(args))">
+
+                                </BlazorDatePicker.DatePickerComponent>
+                                <p style="font-size:11px;color:#ff0000">@EndDate_error</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    
+
+                </div>
+
+            </div>
+
+            <div class="addweb-headline">
+                <div class="step-check">2</div> <h2>Select Website & Upload Display Ads for each</h2>
+            </div>
+
+            <div class="form-table">
+
+
+                <div class="form-group">
+
+
+                    <div class="form-group select-website">
+                        <div class="dropdown dropdown-input">
+                            <button class="btn btn-srcsub dropdown-toggle" style="width:100%" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                @selectedwebsite_domain
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                @if (websites != null)
+                                {
+                                    foreach (var item in websites)
+                                    {
+                                        <li><label @onclick="@(async () => await PickSite(item.Key))">@item.Value</label></li>
+                                    }
+
+
+                                }
+
+
+                            </ul>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <ContainerSetupComponent websiteid="@selectedwebsite"></ContainerSetupComponent>
+
+
+
+        </div>
+
+
+
+
+
+
+
+    </div>
+
+
+</div>
+
+
+@code {
+
+
+    bool completerender = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        completerender = true;
+        await js.InvokeVoidAsync("establishdatepicker");
+    }
+
+    string selectedwebsite = "";
+    string selectedwebsite_domain = "";
+
+
+    [Parameter]
+    public Dictionary<string, string> websites { get; set; }
+
+    [Parameter]
+    public EventCallback OnToPreview { get; set; }
+
+
+    [Parameter]
+    public EventCallback<string> OnTitleChanged { get; set; }
+
+    [Parameter]
+    public string title { get; set; }
+    [Parameter]
+    public string title_error { get; set; }
+
+    [Parameter]
+    public EventCallback<double> OnBudgetChanged { get; set; }
+
+    [Parameter]
+    public double Budget { get; set; }
+    [Parameter]
+    public string Budget_error { get; set; }
+
+    [Parameter]
+    public EventCallback<double> OnDailyBudgetChanged { get; set; }
+
+    [Parameter]
+    public double DailyBudget { get; set; }
+    [Parameter]
+    public string DailyBudget_error { get; set; }
+
+
+    [Parameter]
+    public EventCallback<string> OnTargetChanged { get; set; }
+
+    [Parameter]
+    public string Target { get; set; }
+    [Parameter]
+    public string Target_error { get; set; }
+
+
+    [Parameter]
+    public EventCallback<DateTime> OnEndDateChanged { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+    [Parameter]
+    public string EndDate_error { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnDescriptionChanged { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+    [Parameter]
+    public string Description_error { get; set; }
+
+
+
+    [Parameter]
+    public GeneralModels.Advertiser.CreateCampaigns.Websites.CampaignModel currentcampaign { get; set; }
+
+    async Task PickSite(string websiteid)
+    {
+        selectedwebsite = websiteid;
+        selectedwebsite_domain = websites[websiteid];
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        selectedwebsite = websites.First().Key;
+        selectedwebsite_domain = websites.First().Value;
+
+
+    }
+
+    
+
+}

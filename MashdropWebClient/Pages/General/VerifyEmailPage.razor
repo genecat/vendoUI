@@ -1,0 +1,127 @@
+﻿@page "/verifiyemailpage"
+@page "/verifiyemailpage/{vcode}/{em}"
+@page "/verifiyemailpage/{em}"
+@layout EmptyLayout
+@inject NavigationManager nv
+<!-- Begin page -->
+
+<div class="topbar-login container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 logo-login text-center">
+            <label>Vendo</label>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center alert-block" style="display:none;">
+        <div class="col-lg-7 col-md-9 col-sm-12">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading"></h4>
+                <p></p>
+                <hr />
+                <p class="mb-0"></p>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9 col-sm-12">
+            <div class="form-table">
+
+
+
+
+                <div class="form-group text-center">
+                    <label class="w-100 text-center" for="smscode">Enter the code sent to your email</label>
+                    
+                    <input @bind="@vcode"    class="form-control" style="background-color:#ffffff;color:#000000 !important"  autocomplete="off" />
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-2 text-center mt-4"><a class="btn-big btn-green" @onclick="@(async () => await VerifyEmail())">Verify</a></div>
+                @*  <div class="col-12 text-center signup-link">
+                        <a @onclick="@(async () => await ResendEmail())">Resend email</a>
+                    </div>*@
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- End page -->
+
+
+@code {
+    [Parameter]
+    public string vcode { get; set; }
+
+    [Parameter]
+    public string em { get; set; }
+
+    
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (vcode == null) return; 
+        await VerifyEmail();
+    }
+
+    public class VerifyPayload
+    {
+        public string email { get; set; }
+        public string token { get; set; }
+    }
+
+    async Task VerifyEmail()
+    {
+        try
+        {
+            
+            bool output = await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("/verifyemail", new VerifyPayload() { email = em, token = vcode })).Content.ReadFromJsonAsync<bool>();
+
+            if (output)
+            {
+                nv.NavigateTo("/");
+            }
+            else
+            {
+
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    async Task ResendEmail()
+    {
+
+    }
+}
+
+

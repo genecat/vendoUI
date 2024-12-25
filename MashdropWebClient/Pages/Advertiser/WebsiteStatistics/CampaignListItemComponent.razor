@@ -1,0 +1,479 @@
+﻿ 
+
+@if (campaign != null)
+{
+    <div class="col-lg-6 col-md-12">
+        <div class="campaign-table step-table2" style="background-color: #000 !important;@generatecolorforstatus(campaign.status)">
+            <div class="campaign-headline headline2">
+                <div class="row" style="color:#ffffff !important">
+                    <div class="col-12">
+                        <span style="font-size:25px;text-align:center;">@campaign.title</span><br />
+                        Ends <span class="published">@campaign.dateend.Year/@campaign.dateend.Month/@campaign.dateend.Day</span>
+                    </div>
+                    <div class="col-12">
+                        <p>Status: @generatenameforstatus(campaign.status)</p>
+                    </div>
+                </div>
+                <div class="row campaign-detail">
+
+                  @*  <div class="col-xl-6 col-lg-12">
+                        <div class="campaign-preview">
+                            <img src="images/campaign/website-example.jpg" class="img-fluid" />
+                        </div>
+                    </div>*@
+
+                    
+                    <div class="col-xl-6 col-lg-12 mb-lg-3">
+                        <div class="campaign-info row w-100 justify-content-between">
+                            <div class="col">Daily Limit/Left</div>
+                            <div class="col-auto pl-0 pr-0"><span>$@(Convert.ToDouble(campaign.currentdailybudget) / 100)/$@(Convert.ToDouble(campaign.dailybudget) / 100)</span></div>
+                        </div>
+
+                        
+
+                        @if (stats != null && stats.Count != 0 && stats.ElementAt(selectedwebsiteindex).Value.Count != 0)
+                        {
+                            <div class="campaign-info row w-100 justify-content-between">
+                                <div class="col">Total Clicks</div>
+                                <div class="col-auto pl-0 pr-0"><span>@stats.Sum(x => x.Value.Sum(a => a.clicks))</span></div>
+                            </div>
+                            <div class="campaign-info row w-100 justify-content-between">
+                                <div class="col">Total Impressions</div>
+                                <div class="col-auto pl-0 pr-0"><span>@stats.Sum(x => x.Value.Sum(a => a.impressions))</span></div>
+                            </div>
+                            <div class="campaign-info row w-100 justify-content-between">
+                                <div class="col">eCPC</div>
+                                <div class="col-auto pl-0 pr-0"><span>$@(stats.Sum(x => x.Value.Where(a => a.ecpm != 0).DefaultIfEmpty(new containerstats()).Average(a => a.ecpm)) / 100)</span></div>
+                            </div>
+                        }
+
+                         
+                        <div class="campaign-info row w-100 justify-content-between">
+                            <div class="col">Total Spent</div>
+                            <div class="col-auto pl-0 pr-0"><span>$@((Convert.ToDouble(campaign.originalbudget) - Convert.ToDouble(campaign.budget)) / 100)</span></div>
+                        </div>
+                        <div class="campaign-info row w-100 justify-content-between">
+                            <div class="col">Budget Left</div>
+                            <div class="col-auto pl-0 pr-0"><span>$@(Convert.ToDouble(campaign.budget) / 100)</span></div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="row w-100 mt-3 justify-content-center pl-3">
+                   
+                    @if (campaign.status != 2 && campaign.status != 3 && campaign.status != 5)
+                    {
+                        <div class="col-auto mb-2"><a @onclick="@(async () => await PauseCampaign())" class="btn-small btn-yellowlight"><i class="fas fa-pause"></i> Pause</a></div>
+                    }
+                    @if (campaign.status != 2 && campaign.status != 3)
+                    {
+                        <div class="col-auto mb-2"><a @onclick="@(async () => await SuspendCampaign())" class="btn-small btn-red"><i class="fas fa-stop"></i> Terminate</a></div>
+                    }
+
+                    @if (campaign.status != 1 && campaign.status != 2)
+                    {
+                        <div class="col-auto mb-2"><a @onclick="@(async () => await ResumeCampaign())" class="btn-small btn-green"><i class="fas fa-play"></i> Resume</a></div>
+                    }
+                </div>
+                <hr class="compaign-middle" />
+                <div class="row campaign-detail pl-3">
+                   
+                    <p style="color:#ffffff;"><i class="fa fa-chevron-left" @onclick="@(async () => await ToPreviousSite())" style="cursor:pointer" aria-hidden="true"></i> @currentlisting.domain <i class="fa fa-chevron-right" @onclick="@(async () => await ToNextSite())" style="cursor:pointer" aria-hidden="true"></i></p>
+                </div>
+                <div class="row campaign-detail pl-3">
+
+
+                    <div class="col-xl-6 col-lg-12 cmp-border">
+
+                        <div class="campaign-preview">
+
+                            <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@campaigncontainers[selectedcontainerindex].mediafileid" class="img-fluid" />
+
+
+                        </div>
+
+                        <div class="website-nav">
+                            <div class="website-prev"><i class="fa fa-chevron-left" @onclick="@(async () => await ToPreviousContainer())" style="cursor:pointer" aria-hidden="true"></i></div>
+                            <div class="website-next"><i class="fa fa-chevron-right" @onclick="@(async () => await ToNextContainer())" style="cursor:pointer" aria-hidden="true"></i></div>
+                        </div>
+                        <div class="row w-100 mt-3 justify-content-center pl-3">
+                            @if (campaign.status != 2)
+                            {
+
+
+                                <div class="col-auto mb-2"><a @onclick="@(async () => await PauseContainer())" class="btn-small btn-yellowlight"><i class="fas fa-pause"></i> Pause container</a></div>
+                                <div class="col-auto mb-2"><a @onclick="@(async () => await ResumeContainer())" class="btn-small btn-bluelight"><i class="fas fa-play"></i> Resume container</a></div>
+                            }
+                        </div>
+                    </div>
+                    
+                        <div class="col-xl-6 col-lg-12 mb-lg-3">
+                            @if (stats != null && stats.Count != 0 && stats.ElementAt(selectedwebsiteindex).Value.Count != 0)
+                            {
+                                <div class="campaign-info row w-100 justify-content-between">
+                                    <div class="col">Total Clicks</div>
+                                    <div class="col-auto pl-0 pr-0"><span>@stats.Where(x => x.Key == websites.ElementAt(selectedwebsiteindex).Key).Sum(x => x.Value.Sum(a => a.clicks))</span></div>
+                                </div>
+                                <div class="campaign-info row w-100 justify-content-between">
+                                    <div class="col">eCPC</div>
+                                    <div class="col-auto pl-0 pr-0"><span>$@(stats.Where(x => x.Key == websites.ElementAt(selectedwebsiteindex).Key).Sum(x => x.Value.Where(a => a.ecpm != 0).DefaultIfEmpty(new containerstats()).Average(a => a.ecpm)) / 100)</span></div>
+                                </div>
+                                <div class="campaign-info row w-100 justify-content-between">
+                                    <div class="col">Impressions</div>
+                                    <div class="col-auto pl-0 pr-0"><span>@stats.Where(x => x.Key == websites.ElementAt(selectedwebsiteindex).Key).Sum(x => x.Value.Sum(a => a.impressions))</span></div>
+                                </div>
+                                <div class="campaign-info row w-100 justify-content-between">
+                                    <div class="col">Spent</div>
+                                    <div class="col-auto pl-0 pr-0"><span>$@(stats.Where(x => x.Key == websites.ElementAt(selectedwebsiteindex).Key).Sum(x => x.Value.Sum(a => a.clicks)) * stats.Where(x => x.Key == websites.ElementAt(selectedwebsiteindex).Key).Sum(x => x.Value.Where(a => a.ecpm != 0).DefaultIfEmpty(new containerstats()).Average(a => a.ecpm)) / 100)</span></div>
+                                </div>
+                            }
+                        </div>
+
+                    
+
+
+                </div>
+               
+
+                
+
+                    <div class="row w-100 mt-3 justify-content-center pl-3">
+                        @if ((campaigncontainers[selectedcontainerindex].status == 2 || campaigncontainers[selectedcontainerindex].status == 3) && campaign.status != 2)
+                        {
+                            <div class="col-auto mb-2"><a @onclick="@(async () => await ResumeWebsite())" class="btn-small btn-bluelight"><i class="fas fa-play"></i> Resume website</a></div>
+                        }
+                        else
+                        {
+                            @if (campaign.status != 2)
+                            {
+                                <div class="col-auto mb-2"><a @onclick="@(async () => await PauseWebsite())" class="btn-small btn-yellowlight"><i class="fas fa-pause"></i> Pause website</a></div>
+                            }
+
+
+                        }
+
+
+                    </div>
+
+
+
+
+                </div>
+
+
+            </div>
+    </div>
+}
+
+
+
+@code {
+
+    #region notifications
+    string message_success_campaign_suspend = "";
+    string message_success_campaign_pause = "";
+    string message_success_campaign_resume = "";
+    string message_failure_campaign_suspend = "";
+    string message_failure_campaign_pause = "";
+    string message_failure_campaign_resume = "";
+
+
+    string message_success_website_pause = "";
+    string message_success_website_resume = "";
+    string message_failure_website_pause = "";
+    string message_failure_website_resume = "";
+
+
+    string message_success_container_pause = "";
+    string message_success_container_resume = "";
+    string message_failure_container_pause = "";
+    string message_failure_container_resume = "";
+    #endregion
+
+    [Parameter]
+    public string campaignid { get; set; }
+
+
+    GeneralModels.Advertiser.Management.CampaignModel campaign;
+
+
+    Dictionary<string,string> websites;
+    int selectedwebsiteindex = 0;
+
+    GeneralModels.Advertiser.Management.CampaignWebsiteModel currentwebsite;
+    GeneralModels.Advertiser.CreateCampaigns.Websites.ListingModel currentlisting;
+
+    List<GeneralModels.Advertiser.Management.CampaignContainers> campaigncontainers;
+    int selectedcontainerindex = 0;
+
+
+    public class containerstats
+    {
+        public int impressions { get; set; }
+        public int clicks { get; set; }
+        public double ecpm { get; set; }
+    }
+
+    Dictionary<string, List<containerstats>> stats = new Dictionary<string, List<containerstats>>();
+
+    protected override  async Task OnParametersSetAsync()
+    {
+        try
+        {
+
+
+            campaign = await GeneralLogic.Advertiser.Management.Websites.GetCampaignDetails(campaignid);
+            
+            websites = await GeneralLogic.Advertiser.Management.Websites.GetWebsites(campaignid);
+            if (campaign == null || websites == null)
+            {
+                return;
+            }
+
+            var containersforstats = new List<string>();
+            Console.WriteLine("lt1");
+            foreach (var item in websites)
+            {
+                var containertemp = await GeneralLogic.Advertiser.Management.Websites.GetContainers(item.Key);
+                List<containerstats> statstemp = new List<containerstats>();
+                foreach (var item1 in containertemp)
+                {
+                    try
+                    {
+                        statstemp.Add(await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<containerstats>("/advertiser/getstatsforcontainer?containerid="+item1.id));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+                stats.Add(item.Key, statstemp);
+            }
+
+
+            Console.WriteLine("lt2");
+            selectedwebsiteindex = 0;
+            currentwebsite = await GeneralLogic.Advertiser.Management.Websites.GetWebsiteDetails(websites.ElementAt(0).Key);
+            currentlisting = await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.GetOneRecordForDisplay(currentwebsite.website);
+            campaigncontainers = await GeneralLogic.Advertiser.Management.Websites.GetContainers(websites.ElementAt(0).Key);
+            selectedcontainerindex = 0;
+            Console.WriteLine("lt3");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message+ "ee");
+        }
+    }
+
+    #region navigate websites and containers
+    async Task ToNextSite()
+    {
+        try
+        {
+            if (selectedwebsiteindex >= websites.Count)
+            {
+
+                selectedwebsiteindex = 0;
+            }
+            else
+            {
+                selectedwebsiteindex++;
+            }
+            currentwebsite = await GeneralLogic.Advertiser.Management.Websites.GetWebsiteDetails(websites.ElementAt(selectedwebsiteindex).Key);
+            campaigncontainers = await GeneralLogic.Advertiser.Management.Websites.GetContainers(websites.ElementAt(selectedwebsiteindex).Key);
+            selectedcontainerindex = 0;
+        }
+        catch (Exception e)
+        {
+
+        }
+
+    }
+
+    async Task ToPreviousSite()
+    {
+        if (selectedwebsiteindex != 0)
+        {
+            selectedwebsiteindex--;
+        }else
+        {
+            selectedwebsiteindex = websites.Count - 1;
+        }
+        currentwebsite = await GeneralLogic.Advertiser.Management.Websites.GetWebsiteDetails(websites.ElementAt(selectedwebsiteindex).Key);
+        campaigncontainers = await GeneralLogic.Advertiser.Management.Websites.GetContainers(websites.ElementAt(selectedwebsiteindex).Key);
+        selectedcontainerindex = 0;
+    }
+
+
+    async Task ToNextContainer()
+    {
+        if (selectedcontainerindex + 1 >= campaigncontainers.Count)
+        {
+
+            selectedcontainerindex = 0;
+        }else
+        {
+            selectedcontainerindex++;
+        }
+
+    }
+
+    async Task ToPreviousContainer()
+    {
+        if (selectedcontainerindex != 0)
+        {
+            selectedcontainerindex--;
+        }else
+        {
+            selectedcontainerindex = campaigncontainers.Count - 1;
+        }
+
+    }
+
+    #endregion
+
+
+    #region status changes
+
+    async Task ResumeCampaign()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.ResumeCampaign(campaignid);
+        if (res)
+        {
+            campaign.status = 1;
+        }else
+        {
+
+        }
+    }
+
+    async Task PauseCampaign()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.PauseCampaign(campaignid);
+        if (res)
+        {
+            campaign.status = 5;
+        }else
+        {
+
+        }
+    }
+
+    async Task SuspendCampaign()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.SuspendCampaign(campaignid);
+        if (res)
+        {
+            campaign.status = 2;
+        }else
+        {
+
+        }
+    }
+
+
+    async Task ResumeWebsite()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.ResumeWebsite(websites.ElementAt(selectedwebsiteindex).Key);
+        if (res)
+        {
+
+        }else
+        {
+
+        }
+    }
+
+    async Task PauseWebsite()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.PauseWebsite(websites.ElementAt(selectedwebsiteindex).Key);
+        if (res)
+        {
+
+        }else
+        {
+
+        }
+    }
+
+
+    async Task ResumeContainer()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.ResumeContainer(websites.ElementAt(selectedcontainerindex).Key);
+        if (res)
+        {
+
+        }else
+        {
+
+        }
+    }
+
+
+    async Task PauseContainer()
+    {
+        bool res = await GeneralLogic.Advertiser.Management.Websites.PauseContainer(websites.ElementAt(selectedcontainerindex).Key);
+        if (res)
+        {
+
+        }else
+        {
+
+        }
+    }
+
+
+
+    string generatecolorforstatus(int status)
+    {
+        switch (status)
+        {
+
+            case 1:
+                return "border-top: 3px #23AF47 solid;";
+            case 2:
+                return "border-top: 3px #c40404 solid;";
+            case 3:
+                return "border-top: 3px #c40404 solid;";
+            case 4:
+                return "border-top: 3px #c40404 solid;";
+            case 5:
+                return "border-top: 3px #b5bd00 solid;";
+            case 6:
+                return "border-top: 3px #929292 solid;";
+            case 7:
+                return "border-top: 3px #929292 solid;";
+            default:
+                return "border-top: 3px #23AF47 solid;";
+        }
+    }
+
+
+    string generatenameforstatus(int status)
+    {
+        switch (status)
+        {
+
+            case 1:
+                return "Active";
+            case 2:
+                return "Suspended";
+            case 3:
+                return "Suspended";
+            case 4:
+                return "Suspend (budget)";
+            case 5:
+                return "Paused";
+            case 6:
+                return "Unpaid";
+            case 7:
+                return "Draft";
+            default:
+                return "Draft";
+        }
+    }
+
+    #endregion
+}

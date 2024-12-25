@@ -1,0 +1,303 @@
+﻿@page "/cashaccount/overviewpage"
+@inject IJSRuntime js 
+@inject NavigationManager nm
+
+    <div class="row inside-header header2" id="closeOnClick">
+        <div class="col-lg col-12">
+            <h1 class="mt-2">CASH ACCOUNT</h1>
+        </div>
+
+    </div>
+
+
+
+<div class="container">
+
+    <div class="row mt-5">
+
+        <div class="col-lg-4 col-md-12 order-lg-12">
+            <div class="form-table step-table transaction-height">
+                <div class="account-detail">
+                    <h3>Cash Balance</h3>
+                    <span>Available</span>
+                    <div class="account-value">$@balance</div>
+                    <div class="row">
+                        <div class="form-group col-md-5">
+                            @if (!readyfor_paymentmethodchoice)
+                            {
+                                <label>Deposit value</label>
+                                <input @bind="@depositvalue" type="text" class="form-control" id="cvc" placeholder="" />
+                            }
+                        </div>
+
+                        <div class="form-group col-md-7 pl-0">
+                            @if (!readyfor_paymentmethodchoice)
+                            {
+                                <a @onclick="@(async () => await  ChangeDepositValue())" class="btn-big btn-green">Deposit Funds</a>
+                            }
+                            else
+                            {
+                                <img src="buttonloader1.gif" />
+                            }
+                        </div>
+                    </div>
+                    @if (readyfor_paymentmethodchoice)
+                    {
+                        <div class="row">
+                            <div class="col-auto"><a class="btn-small btn-payment" target="_blank" href="/stripecheckout/@stripeid"><i class="fas fa-credit-card"></i> Credit card</a></div>
+                            @*<div class="col"><a href="#" class="btn-small btn-payment"><i class="fab fa-paypal"></i> PayPal</a></div>*@
+                        </div>
+                    }
+
+
+                </div>
+
+            </div>
+        </div>
+ 
+
+
+    </div>
+</div>
+
+@if (results != null)
+{
+
+
+    <div class="container">
+
+        <div class="campaign-table over-datatable table-limit1 limit2">
+
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr style="color:#ffffff !important">
+                            <th scope="col">ID</th>
+                            <th scope="col" style="cursor:crosshair;" @onclick="@(() => { if (date_order == 0 || date_order == 1) { results = results.OrderBy(el => el.datecreated).ToList(); date_order = 2; } else { results = results.OrderByDescending(el => el.datecreated).ToList(); date_order = 1;} })" >Date</th> 
+                            <th scope="col" style="cursor:crosshair;" @onclick="@(() => { if (value_order == 0 || value_order == 1) { results = results.OrderBy(el => el.value).ToList(); value_order = 2; } else { results = results.OrderByDescending(el => el.value).ToList(); value_order = 1;} })">Amount</th>
+                            <th scope="col" style="cursor:crosshair;" @onclick="@(() => { if (type_order == 0 || type_order == 1) { results = results.OrderBy(el => el.type).ToList(); type_order = 2; } else { results = results.OrderByDescending(el => el.type).ToList(); type_order = 1;} })">Type</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in results)
+                        {
+                        <tr>
+                            <td>@item.id</td>
+                            <td>@item.datecreated.Day/@item.datecreated.Month/@item.datecreated.Year</td>
+                            <td>$@(Convert.ToDouble(item.value) / 100)</td>
+                            <td>@item.type</td>
+                            @switch (item.status)
+                            {
+                                case 1:
+                                    <td><a class="btn-small btn-turquise"  >Completed</a></td>
+                                    break;
+                                case 2:
+                                    <td><a class="btn-small btn-yellowlight"  >Pending</a></td>
+                                    break;
+                                case 3:
+                                    <td><a class="btn-small btn-red"  >Failed</a></td>
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        </tr>
+
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+
+}
+
+@code {
+    double balance = 0;
+
+
+    // list order
+    int date_order = 0;
+    int value_order = 0;
+    int type_order = 0;
+
+    ///  
+    double depositvalue = 0;
+    string stripeid = "";
+    bool readyfor_paymentmethodchoice;
+    string payment_message = "";
+
+
+    async Task ChangeDepositValue()
+    {
+
+        stripeid = await GeneralLogic.GeneralObjects.httpClient_api.GetStringAsync("/begindepositstripe?amnt="+depositvalue.ToString());
+        Console.WriteLine(stripeid);
+        string paymentid = await GeneralLogic.GeneralObjects.httpClient_api.GetStringAsync("/cashaccount/getidbystripeid?stid=" + stripeid);
+        Console.WriteLine(paymentid);
+        readyfor_paymentmethodchoice = true;
+        StateHasChanged();
+        await Task.Run(async () => {
+            int tries = 0;
+            while (true)
+            {
+                await Task.Delay(2000);
+                tries++;
+                int st = await GeneralLogic.Advertiser.CashAccount.Deposits.CheckStatus(paymentid);
+                if (st == 1)
+                {
+                    readyfor_paymentmethodchoice = false;
+                    balance = await GeneralLogic.Advertiser.CashAccount.Statistics.GetBalance();
+                    StateHasChanged();
+                    break;
+                }else
+                {
+                    if (tries > 100)
+                    {
+                        readyfor_paymentmethodchoice = false;
+                        payment_message = "Something went wrong - reload the page or try again later";
+                        StateHasChanged();
+                        break;
+                    }
+                    continue;
+                }
+
+            }
+        });
+    }
+
+    //history 
+    List<result> results;
+
+    DateTime datefrom =  DateTime.UtcNow.AddDays(-90);
+    DateTime dateto = DateTime.UtcNow;
+
+    public class result
+    {
+        public string id { get; set; }
+        public DateTime datecreated { get; set; }
+        public int value { get; set; }
+        public string type { get; set; }
+        public int status { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchRecords();
+    }
+
+
+
+
+    async Task FetchRecords()
+    {
+        try
+        {
+            var tempresults = new List<result>();
+            object[] returns = new object[3];
+            try
+            {
+                balance = await GeneralLogic.Advertiser.CashAccount.Statistics.GetBalance();
+                //  var deposits = await GeneralLogic.Advertiser.CashAccount.Statistics.GetDepositsHistory(datefrom,dateto);
+                //  var payments =  await GeneralLogic.Advertiser.CashAccount.Statistics.GetPaymentsHistory(datefrom,dateto);
+                //  var refunds =  await GeneralLogic.Advertiser.CashAccount.Statistics.GetRefundsHistory(datefrom,dateto);
+
+                returns = await Task.WhenAll<object>(GeneralLogic.Advertiser.CashAccount.Statistics.GetDepositsHistory("1/1/2010 12:00:00 AM", "1/1/2022 12:00:00 AM"),
+                   GeneralLogic.Advertiser.CashAccount.Statistics.GetPaymentsHistory("1/1/2010 12:00:00 AM", "1/1/2022 12:00:00 AM"), GeneralLogic.Advertiser.CashAccount.Statistics.GetRefundsHistory("1/1/2010 12:00:00 AM", "1/1/2022 12:00:00 AM"));
+
+            }
+            catch (Exception e0)
+            {
+                Console.WriteLine(e0.Message + " e0");
+            }
+
+            try
+            {
+                foreach (var item in (List<GeneralModels.Advertiser.CashAccount.DepositModel>)returns[0])
+                {
+                    string provider = item.provider == 1 ? "Stripe" : "PayPal";
+                    tempresults.Add(new result()
+                    {
+                        id = item.id,
+                        datecreated = item.transactiondate,
+                        status = item.currentstatus,
+                        value = item.value,
+
+                        type = "Deposit to the cash account using " + provider + " (" + item.provider_tid + ")"
+                    });
+                }
+            }
+            catch (Exception e1)
+            {
+                Console.WriteLine(e1.Message + " e1");
+            }
+
+            try
+            {
+                foreach (var item in (List<GeneralModels.Advertiser.CashAccount.PaymentModel>)returns[1])
+                {
+
+                    tempresults.Add(new result() {
+                        id = item.id, datecreated = item.datecreated, status = item.status, value = item.value,
+
+                        type = "Payment for campaign "+ item.campaignid
+                    });
+                }
+            }
+            catch (Exception e2)
+            {
+                Console.WriteLine(e2.Message + " e2");
+            }
+
+            try
+            {
+                foreach (var item in (List<GeneralModels.Advertiser.CashAccount.RefundModel>)returns[2])
+                {
+
+                    tempresults.Add(new result()
+                    {
+                        id = item.id,
+                        datecreated = item.transactiondate,
+                        status = item.currentstatus,
+                        value = item.value,
+
+                        type = "Refund to the cash account from campaign balance"
+                    });
+                }
+            }
+            catch (Exception e3)
+            {
+                Console.WriteLine(e3.Message + " e3");
+            }
+
+            try
+            {
+                results = tempresults.OrderByDescending(x => x.datecreated).ToList();
+            }
+            catch (Exception e4)
+            {
+                Console.WriteLine(e4.Message + " e4");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+
+
+
+    async Task BeginCardPayment()
+    {
+        //var id = await GeneralLogic.GeneralObjects.httpClient_api.GetStringAsync("/begindepositstripe?amnt="+depositvalue.ToString());
+        //await js.InvokeAsync<string>("striperedirect", id);
+
+    }
+}

@@ -1,0 +1,79 @@
+﻿<div class="inside-header">
+    <div class="row justify-content-between ml-0 mr-0">
+        <div class="col-sm col-12">
+            <h1 class="mt-2"><i class="fas fa-chevron-left"></i> Preview</h1>
+        </div>
+
+
+    </div>
+
+    <hr class="sort-hr" />
+
+    <div class="search-keywords">
+        <div class="row">
+            <div class="col-md col-12">
+                <div class="sort-average prew-average">
+                    <a href="/clickrates.pdf" target="_blank">CPC rates</a>
+                </div>
+            </div>
+            <div class="col-md col-12">
+                @if(currentcampaign != null)
+                {
+                    <p>To pay: $@currentcampaign.budget</p>
+                }
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+@if (websites != null)
+{
+
+
+    <div class="row ml-2 mr-2 table-limit mt-5">
+
+        @foreach (var item in websites)
+        {
+
+
+            <PreviewWebsiteComponent thiswebsite="@item"></PreviewWebsiteComponent>
+
+        }
+
+
+
+
+
+
+    </div>
+
+}
+
+
+@code {
+
+    int incomplete = 0;
+
+    double averagecpc = 0;
+
+
+    [Parameter]
+    public GeneralModels.Advertiser.CreateCampaigns.Websites.CampaignModel currentcampaign { get; set; }
+
+    [Parameter]
+    public List<GeneralModels.Advertiser.CreateCampaigns.Websites.DraftModel> websites { get; set; }
+
+
+
+
+
+
+}

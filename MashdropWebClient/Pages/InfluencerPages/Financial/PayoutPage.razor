@@ -1,0 +1,318 @@
+﻿@page "/financial/payoutpage"
+
+
+    <div class="row inside-header header2" id="closeOnClick">
+        <div class="col-lg col-12">
+            <h1 class="mt-2">PAYOUTS</h1>
+        </div>
+
+    </div>
+
+
+
+
+<div class="container">
+
+    <div class="row mt-4 table-limit2">
+
+        <div class="col-xl-4 col-lg-12">
+            <div class="form-table wallet-height">
+                <div class="row">
+                    <div class="col-12 form-group ">
+                        <label for="cardexpiry">Payout period</label>
+
+
+                        
+
+
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <div class="form-group select-website scat wallet-date">
+                                    <div class="dropdown dropdown-input">
+                                        <button class="btn btn-srcsub dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            @selectedmonth
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li @onclick="@(async () => await ChangeMonth(4))"><a>4</a></li>
+                                            <li @onclick="@(async () => await ChangeMonth(5))"><a>5</a></li>
+                                            <li @onclick="@(async () => await ChangeMonth(6))"><a>6</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <div class="form-group select-website scat wallet-date">
+                                    <div class="dropdown dropdown-input">
+                                        <button class="btn btn-srcsub dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            @selectedyear
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li @onclick="@(async () => await ChangeYear(2019))"><a>2020</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-6">
+            <div class="form-table step-table wallet-height">
+                <div class="account-detail">
+                    <h3>Payout pending</h3>
+                    <div class="account-value mt-0 mb-0">$0</div>
+                    <span class="wallet-span">Sent on Paydays if minimum met.</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-6">
+            <div class="form-table step-table wallet-height">
+                <div class="account-detail form-group">
+                    @*payout setup*@
+                    @if (viewopened == 1)
+                    {
+                        <label>Paypal Email</label>
+                        <input class="form-control mb-3" @bind="@newpayoutdata.paypalemail" />
+                        <button id="bt_addppl" @onclick="@(async () =>await  CreatePayoutData())" class="GenericVendoButton">Add</button>
+                        <label for="bt_addppl" style="color:#00ff21">@message_success_ppladd</label>
+                        <label for="bt_addppl" style="color:#ff0000">@message_failure_ppladd</label>
+                        @*   @if (currentpayoutdata.status == 2)
+            {
+                <button class="btn-small btn-green" @onclick="@((() => { viewopened = 3; }))">Setup tax form</button>
+            }*@ 
+                    }
+
+
+                    @*payout change*@
+                    @if (viewopened == 2)
+                    {
+                        <label>Paypal Email</label>
+                        @* <p><input /></p>
+            <p><button @onclick="@(async () =>await  CreatePayoutData())">update</button></p>*@
+                        <input class="form-control mb-3" @bind="@newpayoutdata.paypalemail" />
+                        <button id="bt_addppl" @onclick="@(async () =>await  UpdatePayoutData())" class="GenericVendoButton">Update</button>
+                        <label for="bt_addppl" style="color:#00ff21">@message_success_ppladd</label>
+                        <label for="bt_addppl" style="color:#ff0000">@message_failure_ppladd</label>
+                        @if (currentpayoutdata.status == 2)
+                        {
+                            <button class="btn-small btn-green" @onclick="@((() => { viewopened = 3; }))">Setup tax form</button>
+                        }
+                        else
+                        {
+                            <button class="btn-small btn-green" @onclick="@((() => { viewopened = 3; }))">Add new tax form</button>
+                        }
+
+                    }
+
+                    @*payout setup*@
+                    @if (viewopened == 3)
+                    {
+
+                        <div class="form-group form-check pt-3">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input mb-3" type="checkbox" id="box_isuscitizen" @bind="@newtaxdataform.is_uscitizen" />
+                                <label class="custom-control-label checkbox-dark" for="box_isuscitizen">US citizen</label>
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            @if (newtaxdataform.is_uscitizen)
+                            {
+                                <label>social security id</label>
+                                <input class="form-control mb-3" @bind="@newtaxdataform.socialsecurityid" type="text" />
+                                <label>beneficiary</label>
+                                <input class="form-control mb-3" @bind="@newtaxdataform.beneficiary" type="text" />
+                                <label>country</label>
+                                <input class="form-control mb-3" @bind="@newtaxdataform.country" type="text" />
+                                <label>c_state</label>
+                                <input class="form-control mb-3" @bind="@newtaxdataform.c_state" type="text" />
+                                <label>address</label>
+                                <input class="form-control mb-3" @bind="@newtaxdataform.address" type="text" />
+                            }
+                            <button id="bt_frmsubmit" class="btn-small btn-green" @onclick="@(async () =>await  CreateTaxData())">Submit</button>
+                            <label for="bt_frmsubmit" style="color:#00ff21">@message_success_taxform</label>
+                            <label for="bt_frmsubmit" style="color:#ff0000">@message_failure_taxform</label>
+                            <button class="btn-small btn-green" @onclick="@((() => { viewopened = 2; }))">Setup payment</button>
+                        </div>
+
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    @if (displayedpayoutrecords !=null)
+    { 
+    <div class="row table-limit2">
+
+        <div class="campaign-table over-datatable table-limit1 limit3">
+
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Description</th>
+                            <th scope="col">Earnings</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        @foreach (var item in displayedpayoutrecords)
+                        {
+                        <tr>
+                            @switch (item.payouttype)
+                            {
+                                case 1:
+                                    <td>PPC social media</td>
+                                    break;
+                                case 2:
+                                    <td>PPP social media</td>
+                                    break;
+                                case 3:
+                                    <td>PPC websites</td>
+                                    break;
+                                default:
+                                    break;
+                            }
+                            <td>$@item.value</td>
+                            @switch (item.status)
+                            {
+                                case 1:
+                                    <td style="width:250px"><a class="btn-small btn-grey2 font-weight-light">Processing</a></td>
+                                    break;
+                                case 2:
+                                    <td style="width:250px"><a class="btn-small btn-grey2 font-weight-light">Pending</a></td>
+                                    break;
+                                case 3:
+                                    <td style="width:250px"><a class="btn-small btn-grey2 font-weight-light">Paid</a></td>
+                                    break;
+                                case 4:
+                                    <td style="width:250px"><a class="btn-small btn-grey2 font-weight-light">Delayed</a></td>
+                                    break;
+                                case 5:
+                                    <td style="width:250px"><a class="btn-small btn-grey2 font-weight-light">Cancelled</a></td>
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+    }
+
+</div>
+
+
+
+
+
+@code {
+        string message_success_taxform = "";
+        string message_failure_taxform = "";
+        string message_success_ppladd = "";
+        string message_failure_ppladd = "";
+
+        int selectedmonth = 10;
+        int selectedyear = 2019;
+
+        GeneralModels.Influencer.Payouts.CreatePayoutDataModel newpayoutdata = new GeneralModels.Influencer.Payouts.CreatePayoutDataModel();
+        GeneralModels.Influencer.Payouts.CreateTaxDataModel newtaxdataform = new GeneralModels.Influencer.Payouts.CreateTaxDataModel();
+
+
+        GeneralModels.Influencer.Payouts.PayoutDataModel currentpayoutdata = new GeneralModels.Influencer.Payouts.PayoutDataModel();
+        List<GeneralModels.Influencer.Payouts.PayoutRecordModel> displayedpayoutrecords = new List<GeneralModels.Influencer.Payouts.PayoutRecordModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentpayoutdata = await GeneralLogic.Influencer.Payouts.PayoutManager.GetPayoutData();
+        if (currentpayoutdata.status == 1)
+        {
+            viewopened = 2;
+            newpayoutdata.paypalemail = currentpayoutdata.paypalemail;
+        }
+        if (currentpayoutdata.status == 2)
+        {
+            viewopened = 2;
+            newpayoutdata.paypalemail = currentpayoutdata.paypalemail;
+        }
+    }
+
+    async Task ChangeMonth(int newmonth)
+    {
+        selectedmonth = newmonth;
+        displayedpayoutrecords = await GeneralLogic.Influencer.Payouts.PayoutManager.GetPayoutRecordsForPeriod(selectedyear,selectedmonth);
+    }
+
+    async Task ChangeYear(int newyear)
+    {
+        selectedyear = newyear;
+        displayedpayoutrecords = await GeneralLogic.Influencer.Payouts.PayoutManager.GetPayoutRecordsForPeriod(selectedyear,selectedmonth);
+    }
+    //1 
+    int viewopened = 1;
+
+
+    async Task CreateTaxData()
+    {
+        bool success =  await GeneralLogic.Influencer.Payouts.PayoutManager.CreateTaxData(newtaxdataform);
+        if (success)
+        {
+            viewopened = 2;
+            currentpayoutdata.status = 1;
+        }
+        else
+        {
+            message_failure_taxform = "Failed to submit";
+            message_success_taxform = "";
+        }
+    }
+
+    async Task CreatePayoutData()
+    {
+        bool success =  await GeneralLogic.Influencer.Payouts.PayoutManager.CreatePayoutData(newpayoutdata);
+        if (success)
+        {
+            viewopened = 2;
+        }
+        else
+        {
+            message_failure_ppladd  = "Failed to submit";
+        }
+    }
+
+    async Task UpdatePayoutData()
+    {
+        bool success =  await GeneralLogic.Influencer.Payouts.PayoutManager.UpdatePayoutData(newpayoutdata);
+        if (success)
+        {
+            message_success_ppladd = "Information updated";
+        }
+        else
+        {
+            message_failure_ppladd = "Failed to submit";
+        }
+    }
+}

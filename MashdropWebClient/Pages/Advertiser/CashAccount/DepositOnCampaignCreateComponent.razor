@@ -1,0 +1,109 @@
+﻿<div class="row mt-5">
+
+    <div class="col-lg-4 col-md-12 order-lg-12">
+        @if (currentview == 1)
+        {
+
+
+            <div class="form-table step-table transaction-height">
+                <div class="account-detail">
+                    <h3>Cash Balance</h3>
+                    <span>Available</span>
+                    <div class="account-value">@depositvalue</div>
+                    <div class="row">
+                        <div class="form-group col-md-5">
+
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-auto"><a class="btn-small btn-payment" target="_blank" href="/stripecheckout/@stripeid"><i class="fas fa-credit-card"></i> Credit card</a></div>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+        }
+        @if (currentview == 2)
+        {
+            <div class="form-table step-table transaction-height">
+                <div class="account-detail">
+                    <h3>Cash Balance</h3>
+                    <span>Available</span>
+                    <div class="account-value">@depositvalue</div>
+                    <div class="row">
+                        <div class="form-group col-md-5">
+
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-auto"><a class="btn-small btn-payment" target="_blank" href="/stripecheckout/@stripeid"><i class="fas fa-credit-card"></i> Credit card</a></div>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+        }
+        @if (currentview == 2)
+        {
+            <div class="form-table step-table transaction-height">
+                <div class="account-detail">
+                    <p>Loading...</p>
+
+                </div>
+
+            </div>
+        }
+        @if (currentview == 3)
+        {
+            <div class="form-table step-table transaction-height">
+                <div class="account-detail">
+                    <p></p>
+
+                </div>
+
+            </div>
+        }
+        @if (currentview == 4)
+        {
+            <div class="form-table step-table transaction-height">
+                <div class="account-detail">
+                    <p>Loading...</p>
+
+                </div>
+
+            </div>
+        }
+    </div>
+    </div>
+
+    @code {
+
+        int currentview = 1;
+
+
+
+        [Parameter]
+        public double depositvalue { get; set; }
+
+
+        string stripeid;
+
+        [Parameter]
+        public EventCallback<string> OnStripeIdCreated { get; set; }
+
+        protected override  async Task OnInitializedAsync()
+        {
+            stripeid = await GeneralLogic.GeneralObjects.httpClient_api.GetStringAsync("/begindepositstripe?amnt="+depositvalue.ToString());
+            await  OnStripeIdCreated.InvokeAsync(stripeid);
+        }
+
+
+    }

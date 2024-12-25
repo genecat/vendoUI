@@ -1,0 +1,66 @@
+﻿@page "/messagecenterpage"
+
+<div class="inside-header">
+    <div class="row ml-0 mr-0" id="closeOnClick">
+        <div class="col-lg col-12">
+            <h1 class="mt-2"><i class="far fa-comment-dots"></i> CAMPAIGNS<span> - Message Center</span></h1>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<div class="row ml-4 mr-4 mt-4 table-limit2">
+
+    @if (messages != null)
+    {
+
+
+    @foreach (var item in messages)
+    {
+        switch (item.messagetype)
+        {
+            case 1:
+                <BasicMessageComponent></BasicMessageComponent>
+                break;
+            case 2:
+                <MashdropWebClient.Pages.General.MessageCenter.CampaignAprovals.Websites.DisplayCampaignComponent OnDismiss="@(async (args) => await DismissAsync(args))" thismessage="@item"></MashdropWebClient.Pages.General.MessageCenter.CampaignAprovals.Websites.DisplayCampaignComponent>
+
+                break;
+            case 3:
+                <MashdropWebClient.Pages.General.MessageCenter.CampaignAprovals.SocialMedia.DisplayCampaignComponent></MashdropWebClient.Pages.General.MessageCenter.CampaignAprovals.SocialMedia.DisplayCampaignComponent>
+
+                break;
+            case 4:
+                <MashdropWebClient.Pages.General.MessageCenter.CampaignAprovals.SocialMedia.DisplayCampaignComponent></MashdropWebClient.Pages.General.MessageCenter.CampaignAprovals.SocialMedia.DisplayCampaignComponent>
+
+                break;
+            default:
+                break;
+        }
+    }
+    }
+
+</div>
+
+
+ 
+
+
+@code {
+
+
+    List<GeneralModels.MessageCenter.MessageModel> messages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        messages = GeneralLogic.GeneralObjects.messagecenterdata.Messages;
+    }
+
+    async Task DismissAsync(string id)
+    {
+        messages.RemoveAt(messages.FindIndex(x => x.Id == id));
+    }
+}

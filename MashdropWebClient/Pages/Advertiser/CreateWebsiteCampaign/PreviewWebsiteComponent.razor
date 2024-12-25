@@ -1,0 +1,151 @@
+﻿<div class="col-xl-4 col-lg-6 col-md-12">
+    <div class="campaign-table">
+
+
+        <div class="row campaign-headline">
+            <div class="col ml-0 mr-0">
+                <span></span><br />
+
+            </div>
+        </div>
+        <div class="campaign-preview mt-3 mb-3">
+            @if (displayedcontainer == 1)
+            {
+                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@thiswebsite.containers.c1.mediaid" class="img-fluid" />
+            }
+            @if (displayedcontainer == 2)
+            {
+                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@thiswebsite.containers.c2.mediaid" class="img-fluid" />
+            }
+            @if (displayedcontainer == 3)
+            {
+                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@thiswebsite.containers.c3.mediaid" class="img-fluid" />
+            }
+            @if (displayedcontainer == 4)
+            {
+                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@thiswebsite.containers.c4.mediaid" class="img-fluid" />
+            }
+            @if (displayedcontainer == 5)
+            {
+                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@thiswebsite.containers.c5.mediaid" class="img-fluid" />
+            }
+            @if (displayedcontainer == 6)
+            {
+                <img src="https://testapi.vendo.media/WebsiteAdvertsMedia?id=@thiswebsite.containers.c6.mediaid" class="img-fluid" />
+            }
+        </div>
+        <div class="website-nav verfiy-message">
+            <div class="website-prev"><i @onclick="@(async () => await Image_GoBack())" class="fa fa-chevron-left" aria-hidden="true"></i></div>
+            <div class="website-next"><i @onclick="@(async () => await Image_GoForward())" class="fa fa-chevron-right" aria-hidden="true"></i></div>
+        </div>
+        <div class="row campaign-headline mb-2">
+            <div class="col ml-0 mr-0">Containers Selected</div>
+            @{int selcnt = 0;
+                if (thiswebsite.containers.c1.id != "")
+                {
+                    selcnt += 1;
+                }
+
+                if (thiswebsite.containers.c2.id != "")
+                {
+                    selcnt += 1;
+                }
+                if (thiswebsite.containers.c3.id != "")
+                {
+                    selcnt += 1;
+                }
+                if (thiswebsite.containers.c4.id != "")
+                {
+                    selcnt += 1;
+                }
+                if (thiswebsite.containers.c5.id != "")
+                {
+                    selcnt += 1;
+                }
+                if (thiswebsite.containers.c6.id != "")
+                {
+                    selcnt += 1;
+                }
+
+            }
+            <div class="col ml-0 mr-0 text-right"><span>@selcnt</span></div>
+        </div>
+        <div class="row campaign-headline">
+            @*  <div class="col ml-0 mr-0">Estimated Audience</div>
+            <div class="col ml-0 mr-0 text-right"><span>20,000</span></div>*@
+        </div>
+
+    </div>
+</div>
+
+
+@code {
+    List<int> availablecontainers = new List<int>();
+    int displayedcontainer = 0;
+
+
+    [Parameter]
+    public GeneralModels.Advertiser.CreateCampaigns.Websites.DraftModel thiswebsite { get; set; }
+     
+    protected override async Task OnParametersSetAsync()
+    {
+         if (thiswebsite.containers.c1.id != "")
+        {
+            availablecontainers.Add(1);
+        }
+        if (thiswebsite.containers.c2.id != "")
+        {
+            availablecontainers.Add(2);
+        }
+        if (thiswebsite.containers.c3.id != "")
+        {
+            availablecontainers.Add(3);
+        }
+
+        if (thiswebsite.containers.c4.id != "")
+        {
+            availablecontainers.Add(4);
+        }
+
+        if (thiswebsite.containers.c5.id != "")
+        {
+            availablecontainers.Add(5);
+        }
+
+        if (thiswebsite.containers.c6.id != "")
+        {
+            availablecontainers.Add(6);
+        }
+        if (availablecontainers.Count != 0)
+        {
+            displayedcontainer = availablecontainers[0];
+        }
+    }
+
+
+     async Task Image_GoBack()
+    {
+        if (0 == availablecontainers.FindIndex(x => x == displayedcontainer))
+        {
+            displayedcontainer = availablecontainers[availablecontainers.Count];
+        }else
+        {
+            int currentposition = availablecontainers.FindIndex(x => x == displayedcontainer);
+            displayedcontainer = availablecontainers[currentposition - 1];
+        }
+    }
+
+    async Task Image_GoForward()
+    {
+        if (availablecontainers.Count == availablecontainers.FindIndex(x => x == displayedcontainer))
+        {
+            displayedcontainer = availablecontainers[0];
+        }else
+        {
+            int currentposition = availablecontainers.FindIndex(x => x == displayedcontainer);
+            displayedcontainer = availablecontainers[currentposition + 1];
+        }
+    }
+
+
+}

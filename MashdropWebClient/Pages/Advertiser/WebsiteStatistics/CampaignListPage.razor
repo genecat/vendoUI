@@ -1,0 +1,47 @@
+﻿@page "/advertiser/websitestatistics/campaignlistpage"
+@page "/advertiser/overview"
+<div class="row inside-header header2" id="closeOnClick">
+    <div class="col-lg col-12">
+        <h1 class="mt-2">
+            <i class="fas fa-bullhorn"></i> CAMPAIGNS
+            @if (campaigns != null)
+            {
+                <span>  @campaigns.Count</span>
+            }
+        </h1>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="row mt-4 table-no-limit">
+
+    @if (campaigns != null)
+    {
+        @foreach (var item in campaigns)
+        {
+            <CampaignListItemComponent campaignid="@item.Key"></CampaignListItemComponent>
+        }
+    }
+
+
+
+</div>
+
+@code {
+    public Dictionary<string, string> campaigns;
+
+    protected override async Task OnInitializedAsync()
+    {
+         Console.WriteLine("st2");
+         campaigns = await GeneralLogic.Advertiser.Management.Websites.GetCampaigns();
+         
+    }
+}

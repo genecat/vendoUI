@@ -1,0 +1,85 @@
+﻿@page "/cashaccount/depositpage"
+@inject IJSRuntime js
+
+<div class="inside-header">
+    <div class="row ml-0 mr-0" id="closeOnClick">
+        <div class="col-lg col-12">
+            <h1 class="mt-2">PAYMENT</h1>
+        </div>
+
+    </div>
+
+
+
+</div>
+
+
+<div class="container">
+
+    <div class="row justify-content-center step-header mt-5 mb-5">
+
+
+        <div class="col-md col-xl-6 col-lg-8 step-form-r">
+
+            <div class="form-table">
+
+                <div class="form-group row">
+
+                    <div class="col-12">
+                        <div class="form-group creditcard">
+                            <label for="cardnumber">Card Number</label>
+                            <input type="text" class="form-control  input-100" id="cardnumber" placeholder="**** **** **** ****" />
+                            <span><i class="far fa-credit-card"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cardexpiry">Card Expiry</label>
+                            <input type="text" class="form-control" id="cardexpiry" placeholder="MM/YYYY" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cvc">@test</label>
+                            <input type="text" class="form-control" id="cvc" placeholder="123" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="targeturl" placeholder="$" />
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <a class="btn-big btn-green" @onclick="@BeginCardPayment">Pay $500,00</a>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+
+    </div>
+</div>
+
+@code {
+
+    string test;
+    async void BeginCardPayment()
+    {
+        test = await js.InvokeAsync<string>("striperedirect");
+    }
+}

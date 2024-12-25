@@ -1,0 +1,59 @@
+﻿@page "/subscriptionpage" 
+
+<div class="row" style="color:#ffffff">
+    <div class="col-md-4">
+        
+        <div class="campaign-table">
+            <p>Order</p>
+            <textarea @bind="@Order.Message" style="width:400px;height:200px;">
+
+            </textarea>
+            <button @onclick="@(async () => await CreateOrder())">Request</button>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        
+    </div>
+
+    <div class="col-md-4">
+        <div class="campaign-table">
+            
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    EmailOrderModel Order = new EmailOrderModel();
+
+    public class EmailOrderModel
+    {
+        public string Message { get; set; }
+        public string UserId { get; set; }
+    }
+
+    string error = "";
+
+    async Task CreateOrder()
+    {
+        try
+        {
+            if (await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("/sendemailorder", Order)).Content.ReadFromJsonAsync<bool>())
+            {
+                error = "Sent";
+            }
+            else
+            {
+                error = "Something failed";
+            }
+        }
+        catch (Exception e)
+        {
+
+
+        }
+    }
+
+}

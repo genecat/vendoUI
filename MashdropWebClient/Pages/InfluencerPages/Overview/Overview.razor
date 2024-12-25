@@ -1,0 +1,205 @@
+﻿
+@inject IJSRuntime js
+ 
+ 
+
+<div class="row inside-header header2" id="closeOnClick">
+    <div class="col-lg col-12">
+        <h1 class="mt-2"><i class="fas fa-eye"></i> OVERVIEW</h1>
+    </div>
+  
+
+</div>
+
+
+
+<div class="row inside-header header2 stats-header pt-0">
+    <hr class="sort-hr w-100 mt-0" />
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>0</span><br />Total Campaigns
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>0</span><br />Total Clicks
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>0</span><br />Total impressions
+    </div>
+
+    <div class="col-xl-2 col-lg-4  col-sm-4">
+        <span>0</span><br />CTR
+    </div>
+
+    <div class="col-xl-2 col-lg-4  col-sm-4">
+        <span>$0</span><br />Total Paid
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-sm-4">
+        <span>$0</span><br />Expected next period
+    </div>
+</div>
+
+
+
+
+@*
+
+<div class="container">
+    
+    <div class="row stats-page">
+
+        <h5 class="form-headline head-white w-100 mt-5 pl-4">Social Networks</h5>
+
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pl-0 col">Total Clics</div>
+                    <div class="pr-0 col-auto">Last 24-Hours</div>
+                </div>
+                <div class="chart-table">
+                    <canvas id="chart1"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pl-0 col">Clic Sources</div>
+                    <div class="pr-0 col-auto">Last 24-Hours</div>
+                </div>
+                <div class="chart-table">
+                    <canvas id="chart2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-12 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pr-0 col">Total Clics</div>
+                    <div class="col-auto">Last 7 Hours</div>
+                </div>
+                <div class="chart-table">
+                    <canvas id="chart3"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row stats-header">
+                    <div class="pr-0 col">Distribution per Platform</div>
+                    <div class="col-auto">Last 24-Hours</div>
+                </div>
+
+
+                <div class="chart-table">
+                    <canvas id="chart4"></canvas>
+                </div>
+
+
+            </div>
+        </div>
+         
+
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-auto mb-3">
+        <a class="btn-big btn-grey-light" href="#">All</a>
+    </div>
+
+    <div class="col-auto mb-3">
+        <a class="btn-big btn-green" href="#">Add Campaign</a>
+    </div>
+
+    <div class="col-auto mb-3">
+        <div class="form-group header-search mb-0">
+            <input type="text" class="form-control" placeholder="search" id="search" autocomplete="off" />
+            <a href="#"><i class="fas fa-search"></i></a>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="campaign-table over-datatable table-limit1">
+
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Channel</th>
+                    <th scope="col">Start Date / End Date</th>
+                    <th scope="col">Impresions / Clicks</th>
+                    <th scope="col">Campaign Budget / Used</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>019</td>
+                    <td>Campaign 3</td>
+                    <td><input type="range" class="custom-range" min="1" max="3" value="2" id="customRange1" /></td>
+                    <td><span class="green">Social</span></td>
+                    <td>TV,FB</td>
+                    <td>2019-04-04 / 2019-04-10</td>
+                    <td>10,345 / 204</td>
+                    <td>$100 / $25</td>
+                    <td><a href="#" class="btn-text-green"><i class="fas fa-chart-line"></i></a> <a href="#" class="btn-text-green"><i class="fas fa-cog"></i></a></td>
+                </tr>
+                <tr>
+                    <td>020</td>
+                    <td>Campaign 4</td>
+                    <td><input type="range" class="custom-range" min="1" max="3" value="1" id="customRange2" /></td>
+                    <td><span class="green">Social</span></td>
+                    <td>LI</td>
+                    <td>2019-04-04 / 2019-04-10</td>
+                    <td>1045 / 20</td>
+                    <td>$100 / $25</td>
+                    <td><a href="#" class="btn-text-green"><i class="fas fa-chart-line"></i></a> <a href="#" class="btn-text-green"><i class="fas fa-cog"></i></a></td>
+                </tr>
+                <tr>
+                    <td>021</td>
+                    <td>Campaign 5</td>
+                    <td><input type="range" class="custom-range" min="1" max="3" value="3" id="customRange3" /></td>
+                    <td><span class="orange">Website</span></td>
+                    <td>Jane's Blog</td>
+                    <td>2019-04-04 / 2019-04-10</td>
+                    <td>8988 / 150</td>
+                    <td>$500 / $25</td>
+                    <td><a href="#" class="btn-text-green"><i class="fas fa-chart-line"></i></a> <a href="#" class="btn-text-green"><i class="fas fa-cog"></i></a></td>
+                </tr>
+                <tr>
+                    <td>022</td>
+                    <td>Campaign 6</td>
+                    <td><input type="range" class="custom-range" min="1" max="3" value="2" id="customRange4" /></td>
+                    <td><span class="green">Social</span></td>
+                    <td>FB</td>
+                    <td>2019-04-04 / 2019-04-10</td>
+                    <td>14,565 / 904</td>
+                    <td>$500 / $25</td>
+                    <td><a href="#" class="btn-text-green"><i class="fas fa-chart-line"></i></a> <a href="#" class="btn-text-green"><i class="fas fa-cog"></i></a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+    *@
+
+
+
+
+ 

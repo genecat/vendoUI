@@ -1,0 +1,535 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="/" />
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <title>MashdropWebClient</title>
+    <link rel="shortcut icon" type="images/x-icon" href="images/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700|Poppins:300,400,500,600,700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/all.css" />
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="assets/css/datepickk.min.css" />
+
+    <link href="assets/css/style.css" rel="stylesheet" />
+
+    <!-- Custom CSS Codes -->
+    <link href="assets/css/custom.css" rel="stylesheet" />
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+    <!--phone and country-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/css/intlTelInput.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/intlTelInput.js"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/country-select-js/2.0.1/css/countrySelect.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/country-select-js/2.0.1/js/countrySelect.js"></script>
+
+
+    <script src="assets/js/WebsiteStatisticsCharts.js"></script>
+
+
+    <link href="_content/BlazorDatePicker/styles.css" rel="stylesheet" />
+    <link href="_content/BlazorCountryPicker/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <script>
+        if (location.protocol !== 'https:') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+    <!-- HTML -->
+
+
+
+    <app>
+        <p><img style="margin-left:45%;margin-top:40vh;" src="/images/roll.gif" /></p>
+        <p style="color:white;text-align:center;">Tip: Add cash to your cash account before creating a campaign</p>
+    </app>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+
+
+
+
+    <script src="assets/js/popper.min.js"></script>
+
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/datepickk.min.js"></script>
+
+    <script>
+        var host = "https://api.vendo.media";
+        var oldhost = "http://localhost:8000";
+
+
+        function InitiateImageUpload(tp) {
+            switch (tp) {
+                case 1:
+                    document.getElementById("").click();
+                    break;
+                case 2:
+                    document.getElementById("").click();
+                    break;
+                case 3:
+                    document.getElementById("").click();
+                    break;
+                case 4:
+                    document.getElementById("").click();
+                    break;
+                case 5:
+                    document.getElementById("").click();
+                    break;
+                case 6:
+                    document.getElementById("").click();
+                    break;
+                case 7:
+                    document.getElementById("listinglogofilepicker").click();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        function UploadContainerImage(id, ctype) {
+
+
+            var formdt = new FormData();
+            formdt.append("fl", document.getElementById(id).files[0]);
+            return fetch(host + "/WebsiteAdvertsMedia?ctype=" + ctype, {
+                credentials: 'omit', // 'include', default: 'omit'
+                method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+
+                body: formdt, // Coordinate the body type with 'Content-Type'
+                headers: new Headers({
+                    'Auth': localStorage["Auth"]
+                }),
+            }).then(response => response.text()).catch((e) => console.log(e));
+
+        }
+
+
+        function UploadListingImage(id) {
+
+            var formdt = new FormData();
+            formdt.append("logofile", document.getElementById(id).files[0]);
+            return fetch(host + "/upload/websitelistinglogo", {
+                credentials: 'omit', // 'include', default: 'omit'
+                method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+                body: formdt, // Coordinate the body type with 'Content-Type'
+                headers: new Headers({
+                    'Auth': localStorage["Auth"]
+                }),
+            }).then(response => response.text()).catch((e) => console.log(e));
+        }
+
+
+        function UploadSocialMediaImage(id) {
+
+            var formdt = new FormData();
+            formdt.append("logofile", document.getElementById(id).files[0]);
+            return fetch(oldhost + "/upload", {
+                credentials: 'omit', // 'include', default: 'omit'
+                method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+                body: formdt, // Coordinate the body type with 'Content-Type'
+                headers: new Headers({
+                    'Auth': localStorage["Auth"]
+                }),
+            }).then(response => response.text()).catch((e) => console.log(e));
+        }
+
+
+
+        var datepicker = new Datepickk();
+
+        var stripe = Stripe('pk_live_ABkTLjuX4yE4E0nFcG6fg3ZT00bgRoVQN4');
+
+        function striperedirect(id) {
+            stripe.redirectToCheckout({
+
+                sessionId: id,
+            }).then(function (result) {
+                return result;
+            });
+        }
+
+
+
+        function openphoneplugin() {
+            var input = document.querySelector("#phone");
+            window.intlTelInput(input);
+        }
+
+        function opencountryplugin() {
+
+            $("#country").countrySelect({
+                preferredCountries: ["xx"]
+            });
+
+            blankFlag.call(this);
+
+            $("#country").on('change', blankFlag);
+
+            function blankFlag(e) {
+                if ($('.flag').hasClass('xx')) {
+
+                    $('.xx').addClass('blank');
+
+                } else {
+
+                    return false;
+                }
+            }
+        }
+    </script>
+
+    <script src="assets/js/scripts.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="assets/js/bootstrap-select.min.js"></script>
+
+    <style>
+        .iti__flag {
+            background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/img/flags.png");
+        }
+
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .iti__flag {
+                background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/img/flags@2x.png");
+            }
+        }
+
+
+        .country-select-input .flag {
+            background-image: url("https://cdnjs.cloudflare.com/ajax/libs/country-select-js/2.0.1/img/flags.png");
+        }
+    </style>
+
+    <script>
+        function menuopen() {
+            var element = document.getElementById("sidebarnew");
+
+            if (element.classList) {
+                element.classList.toggle("sidebaropen");
+            } else {
+                var classes = element.className.split(" ");
+                var i = classes.indexOf("sidebaropen");
+
+                if (i >= 0)
+                    classes.splice(i, 1);
+                else
+                    classes.push("sidebaropen");
+                element.className = classes.join(" ");
+            }
+        }
+
+
+
+        function testchart() {
+            //CHART 1
+
+            var ctx = document.getElementById('chart1').getContext('2d');
+            ctx.canvas.width = 250;
+            ctx.canvas.height = 210;
+            var chart1 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [12, 19, 3, 5, 2, 3, 7],
+                        backgroundColor: [
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47'
+                        ],
+                        borderColor: [
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.yLabel;
+                            }
+                        }
+                    }
+                }
+            });
+
+
+            //CHART 2
+
+            var ctx = document.getElementById('chart2').getContext('2d');
+            ctx.canvas.width = 250;
+            ctx.canvas.height = 210;
+            var chart2 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Campaign 1', 'Campaign 2', 'Campaign 3'],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [12, 19, 3],
+                        backgroundColor: [
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47'
+                        ],
+                        borderColor: [
+                            '#23AF47',
+                            '#23AF47',
+                            '#23AF47'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.yLabel;
+                            }
+                        }
+                    }
+                }
+            });
+
+
+
+            //CHART 3
+
+
+            var ctx = document.getElementById("chart3").getContext('2d');
+            ctx.canvas.width = 250;
+            ctx.canvas.height = 250;
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ["M", "T", "W", "T", "F", "S", "S"],
+                    datasets: [{
+                        label: 'Views',
+                        backgroundColor: "#23AF47",
+                        data: [12, 59, 5, 56, 58, 12, 59],
+                    }, {
+                        label: 'Click',
+                        backgroundColor: "#E9573D",
+                        data: [12, 59, 5, 56, 58, 12, 59],
+                    }],
+                },
+                options: {
+                    tooltips: {
+                        displayColors: true,
+                        callbacks: {
+                            mode: 'x',
+                        },
+                    },
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display: false,
+                            }
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true,
+                            },
+                            type: 'linear',
+                        }]
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    },
+                }
+            });
+
+
+            //CHART 4
+
+
+            var ctx = document.getElementById('chart4').getContext('2d');
+            ctx.canvas.width = 250;
+            ctx.canvas.height = 250;
+            var chart4 = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Facebook', 'Twitter', 'Linkedin', 'Website'],
+                    datasets: [{
+                        data: [12, 19, 3, 5],
+                        backgroundColor: [
+                            '#3BADD9',
+                            '#E9573D',
+                            '#35BB9B',
+                            '#F5BB43'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+
+                options: {
+                    legend: {
+                        display: false
+                    },
+                }
+            });
+
+
+            //CHART 5
+
+
+            var ctx = document.getElementById('chart5').getContext('2d');
+            ctx.canvas.width = 250;
+            ctx.canvas.height = 250;
+            var chart5 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+                    datasets: [
+                        {
+                            label: "Option1",
+                            backgroundColor: "#23AF47",
+                            data: [12, 19, 3, 5, 2, 3, 7]
+                        }, {
+                            label: "Option2",
+                            backgroundColor: "#E9573D",
+                            data: [4, 7, 10, 2, 8, 5, 13]
+                        }
+                    ]
+                },
+
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.yLabel;
+                            }
+                        }
+                    }
+                }
+            });
+
+
+            //CHART 6
+
+
+
+            var ctx = document.getElementById('chart6').getContext('2d');
+            ctx.canvas.width = 250;
+            ctx.canvas.height = 250;
+            var chart6 = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    labels: "Platforms",
+                    datasets: [
+                        {
+                            label: ["Facebook"],
+                            backgroundColor: "#3BADD9",
+                            data: [{
+                                x: 21,
+                                y: 5.245,
+                                r: 15
+                            }]
+                        }, {
+                            label: ["Twitter"],
+                            backgroundColor: "#E9573D",
+                            data: [{
+                                x: 25,
+                                y: 7.526,
+                                r: 10
+                            }]
+                        }, {
+                            label: ["Linkedin"],
+                            backgroundColor: "#35BB9B",
+                            data: [{
+                                x: 39,
+                                y: 6.994,
+                                r: 15
+                            }]
+                        }, {
+                            label: ["Websites"],
+                            backgroundColor: "#F5BB43",
+                            data: [{
+                                x: 49,
+                                y: 5.921,
+                                r: 15
+                            }]
+                        }
+                    ]
+                },
+                options: {
+                    legend: {
+                        display: false
+                    },
+                }
+            });
+        }
+    </script>
+
+
+    <link type="text/css" rel="stylesheet" href="assets/css/tail.datetime-default-green.css" />
+
+
+    <script type="text/javascript" src="assets/js/tail.datetime.min.js"></script>
+    <!-- <script type="text/javascript" src="langs/tail.datetime-{lang}.js"></script> -->
+
+    <script type="text/javascript">
+        function establishdatepicker() {
+            tail.DateTime(".tail-datetime-field", {
+                timeHours: true,
+                timeHours: true,
+                timeMinutes: true,
+                timeSeconds: false,
+                dateFormat: "mm-dd-YYYY",
+                timeFormat: "HH:ii:ss"
+            });
+        }
+    </script>
+
+
+
+</body>
+</html>

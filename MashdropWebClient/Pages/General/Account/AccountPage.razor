@@ -1,0 +1,198 @@
+﻿@page "/accountpage" 
+
+    <div class="row" style="color:#ffffff">
+        <div class="col-md-4">
+            @*   <div class="campaign-table">
+              <p>Representative Details</p>
+        <p>Full name</p>
+        <p><input /></p>
+        <p>
+            <label for="username">Phone</label>
+            <input type="tel" id="phone" />
+        </p>
+            </div>*@
+            <div class="campaign-table">
+                <p>Permissions</p>
+
+                <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" @bind="@consent.consent_email" class="custom-control-input" id="customCheck2" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck2">I agree to receive communications over the email</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" @bind="@consent.consent_sms" class="custom-control-input" id="customCheck3" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck3">I agree to receive communications over SMS</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" @bind="@consent.consent_call" class="custom-control-input" id="customCheck4" />
+                    <label class="custom-control-label checkbox-dark" for="customCheck4">I agree to receive communications over a phone call</label>
+                </div>
+                <p><button @onclick="@(async () => await UpdateConsentDetails())">Update</button></p>
+                <p style="color:#ff0000">@updateconsent_error</p>
+                <p style="color:#4cff00">@updateconsent_success</p>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+           @* <div class="campaign-table">
+                <p>Company details</p>
+                <p>Company name</p>
+                <p><input /></p>
+                <p>Company id</p>
+                <p><input /></p>
+                <p>Company addres</p>
+                <p><input /></p>
+                <p>Country</p>
+                <p>
+                    <input id="country" type="text" />
+                    <input type="hidden" id="country_code" />
+                </p>
+                <p><button>Update</button></p>
+            </div>*@
+        </div>
+
+        <div class="col-md-4">
+            <div class="campaign-table">
+                <p>Change password</p>
+                <p>Email</p>
+                <p><input type="text" @bind="@emailforrequest"   class="form-control" /></p>
+                <p><button @onclick="@(async () => await RequestPasswordChange())">Request change</button></p>
+            </div>
+        </div>
+    </div>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var details = await GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<generalupdatedetails>("/account/getalldata");
+
+        emailforrequest = details.email;
+
+        consent.consent_call = details.consent_call;
+        consent.consent_email = details.consent_email;
+        consent.consent_sms = details.consent_sms;
+
+    }
+
+    //objects
+
+    string emailforrequest = "";
+
+    CompanyUpdateDetails company;
+
+    RepresentativeUpdateDetails representative;
+
+    ConsentUpdateDetails consent = new ConsentUpdateDetails();
+
+
+    //calls
+
+    async Task UpdateRepDetails()
+    {
+        try
+        {
+            var result = GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<bool>("/account/updategeneral");
+        }
+        catch (Exception e)
+        {
+
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    string updateconsent_error = "";
+    string updateconsent_success = "";
+
+    async Task UpdateConsentDetails()
+    {
+        try
+        {
+            var result = await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("/account/updateconsent",consent)).Content.ReadFromJsonAsync<bool>();
+            if (result)
+            {
+                updateconsent_error = "";
+                updateconsent_success = "Updated";
+            }else
+            {
+                updateconsent_error = "Something went wrong";
+                updateconsent_success = "";
+            }
+        }
+        catch (Exception e)
+        {
+            updateconsent_error = "Something went wrong";
+            updateconsent_success = "";
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    async Task UpdateCompanyDetails()
+    {
+        try
+        {
+            var result = GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<bool>("/account/updaterep");
+        }
+        catch (Exception e)
+        {
+
+            Console.WriteLine(e.Message);
+        }
+    }
+
+
+    async Task RequestPasswordChange()
+    {
+        try
+        {
+            var result = GeneralLogic.GeneralObjects.httpClient_api.GetFromJsonAsync<bool>("account/requestchangepassword?email="+emailforrequest);
+        }
+        catch (Exception e)
+        {
+
+            Console.WriteLine(e.Message);
+        }
+    }
+
+
+    //models
+    public class CompanyUpdateDetails
+    {
+        public string company { get; set; }
+        public string country { get; set; }
+        public string companyaddress { get; set; }
+        public string companyid { get; set; }
+    }
+
+    public class RepresentativeUpdateDetails
+    {
+        public string fullname { get; set; }
+        public string phone { get; set; }
+    }
+
+    public class ConsentUpdateDetails
+    {
+        public bool consent_email { get; set; }
+        public bool consent_sms { get; set; }
+        public bool consent_call { get; set; }
+    }
+
+
+
+    public class generalupdatedetails
+    {
+        public string company { get; set; }
+        public string country { get; set; }
+        public string companyaddress { get; set; }
+        public string companyid { get; set; }
+        public string fullname { get; set; }
+        public string phone { get; set; }
+        public bool consent_email { get; set; }
+        public bool consent_sms { get; set; }
+        public bool consent_call { get; set; }
+        public string email { get; set; }
+    }
+
+
+    }

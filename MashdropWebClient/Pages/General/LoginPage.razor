@@ -1,0 +1,238 @@
+﻿@page "/loginpage"
+@page "/"
+
+@inject NavigationManager Urihelper
+@inject IJSRuntime js
+@layout EmptyLayout
+<!-- Begin page -->
+
+<div class="topbar-login container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 logo-login text-center">
+            <label>ADVERTISER</label>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+
+
+    <div class="row justify-content-center alert-block" style="@alertdisplaymode">
+        <div class="alert alert-danger alert-login alert-dismissible fade show" role="alert">
+            <h4 class="alert-heading">Failed</h4>
+            <p>@alertmessage</p>
+            <p class="mb-0"></p>
+            <button type="button" class="close" @onclick="@(() => { alertdisplaymode = "display:none;"; })" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <div class="form-table">
+
+                <div class="form-group">
+                    <label for="formGroupExampleInput">Email</label>
+                    <input @bind="@logindetails.email" type="text" style="background-color:#ffffff !important;color:black !important"  class="form-control" id="username" autocomplete="off" />
+                </div>
+
+                <div class="form-group">
+                    <label for="formGroupExampleInput">Password</label>
+                    <input @bind="@logindetails.password" type="password"  style="background-color:#ffffff !important;color:black !important"  class="form-control" id="password" autocomplete="off" />
+
+                </div>
+
+            </div>
+
+            <div class="form-group form-check pt-3">
+                <div class="custom-control custom-checkbox">
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6 mb-2 text-sm-right text-center"><button class="btn-big btn-green" @onclick="@(async () => await LoginAsAdvertiser())">Login as Advertiser</button></div>
+                <div class="col-sm-6 mb-2 text-sm-left text-center"><button class="btn-big btn-green" @onclick="@(async () => await LoginAsInfluencer())">Login as Influencer</button></div>
+                <div class="col-12 text-center signup-link">
+
+                    Dont have an account? <a href="/registerpage">Sign Up</a>
+                    Forgot password? <a href="/ChangePasswordPage">Change</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    string alertmessage;
+    string alertdisplaymode = "display:none;";
+    authdetailsmodel logindetails = new authdetailsmodel();
+
+    async Task LoginAsInfluencer()
+    {
+        try
+        {
+
+            logindetails.accounttype = 2;
+
+            var authobject = await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("/auth", logindetails)).Content.ReadFromJsonAsync<authmodel>();
+            if (authobject.Success == 1)
+            {
+                GeneralLogic.GeneralObjects.httpClient_api.DefaultRequestHeaders.Add("Auth", authobject.Token);
+                await js.InvokeVoidAsync("localStorage.setItem", "Auth", authobject.Token);
+                Urihelper.NavigateTo("/influencer/websitestatistics/campaignlistpage");
+            }
+            else
+            {
+                switch (authobject.Error)
+                {
+                    case 1:
+                        alertdisplaymode = "display:block;";
+                        alertmessage = "Something went wrong, try again";
+                        break;
+
+                    case 2:
+                        alertdisplaymode = "display:block;";
+                        alertmessage = "User does not exist";
+                        break;
+                    case 3:
+                        alertdisplaymode = "display:block;";
+                        alertmessage = "Wrong password";
+                        break;
+                    case 7:
+                        Urihelper.NavigateTo("/verifiyemailpage");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+        catch (HttpRequestException e)
+        {
+            alertdisplaymode = "display:block;";
+            alertmessage = "Network problem";
+        }
+        catch (Exception e1)
+        {
+            alertdisplaymode = "display:block;";
+            alertmessage = "Something went wrong";
+        }
+
+    }
+
+    async Task LoginAsAdvertiser()
+    {
+        try
+        {
+
+            logindetails.accounttype = 1;
+
+            var authobject = await (await GeneralLogic.GeneralObjects.httpClient_api.PostAsJsonAsync("/auth", logindetails)).Content.ReadFromJsonAsync<authmodel>();
+            if (authobject.Success == 1)
+            {
+                GeneralLogic.GeneralObjects.httpClient_api.DefaultRequestHeaders.Add("Auth", authobject.Token);
+                await js.InvokeVoidAsync("localStorage.setItem", "Auth", authobject.Token);
+
+                Urihelper.NavigateTo("/advertiser/websitestatistics/campaignlistpage");
+            }
+            else
+            {
+                switch (authobject.Error)
+                {
+                    case 1:
+                        alertdisplaymode = "display:block;";
+                        alertmessage = "Something went wrong, try again";
+                        break;
+
+                    case 2:
+                        alertdisplaymode = "display:block;";
+                        alertmessage = "User does not exist";
+                        break;
+                    case 3:
+                        alertdisplaymode = "display:block;";
+                        alertmessage = "Wrong password";
+                        break;
+                    case 7:
+                        Urihelper.NavigateTo("/verifiyemailpage");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+        catch (HttpRequestException e)
+        {
+            alertdisplaymode = "display:block;";
+            alertmessage = "Network problem";
+        }
+        catch (Exception e1)
+        {
+            alertdisplaymode = "display:block;";
+            alertmessage = "Something went wrong";
+        }
+
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            string token = await js.InvokeAsync<string>("localStorage.getItem", "Auth");
+
+
+
+            if (token != ""  && token !=  null)
+            {
+                GeneralLogic.GeneralObjects.httpClient_api.DefaultRequestHeaders.Add("Auth", token);
+
+                var usertype = await GeneralLogic.Authorization.Authorization.GetCurrentAccountType();
+                if (usertype == 1)
+                {
+                    Urihelper.NavigateTo("/advertiser/websitestatistics/campaignlistpage");
+                }
+                else
+                {
+                    Urihelper.NavigateTo("/influencer/websitestatistics/campaignlistpage");
+                }
+            }
+            else
+            {
+                Console.WriteLine("not found");
+                Urihelper.NavigateTo("/loginpage");
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            Urihelper.NavigateTo("/loginpage");
+        }
+    }
+
+    class authmodel
+    {
+        public int Success { get; set; }
+        public string Id { get; set; }
+        public string Token { get; set; }
+        public int Error { get; set; }
+    }
+
+    class authdetailsmodel
+    {
+        public string email { get; set; }
+        public string password { get; set; }
+        public int accounttype { get; set; }
+    }
+}
+
+

@@ -1,0 +1,47 @@
+﻿@page "/websites/listingmanager"
+<div class="row justify-content-between inside-header header2 ">
+    <div class="col-sm col-12">
+        @if (createopen)
+        {
+            <h1 class="mt-2">CREATE NEW LISTING</h1>
+        }
+        else
+        {
+            <h1 class="mt-2">MY LISTINGS</h1>
+        }
+
+
+
+    </div>
+    <div class="col-12 col-sm-auto">
+        <div class="form-group header-search mb-0">
+            @if (createopen)
+            {
+                <a class="GenericVendoButton" @onclick="@(async () => { createopen = false;  })">Manage</a>
+            }
+            else
+            {
+                <a class="GenericVendoButton" @onclick="@(async () => { createopen = true;   })">Create new</a>
+            }
+
+        </div>
+    </div>
+</div>
+
+@if (createopen)
+{
+    <NewListingComponent @key="DateTime.UtcNow.Ticks.ToString()" OnSubmitSuccess="@((arg) => {idtoselect =arg ; createopen = false; })"></NewListingComponent>
+
+}
+else
+{
+    <ManagementComponent IdToSelect="@idtoselect" @key="DateTime.UtcNow.Ticks.ToString()"></ManagementComponent>
+}
+
+@code {
+    bool createopen = false;
+
+    string idtoselect = "";
+
+
+}

@@ -1,0 +1,66 @@
+﻿
+
+
+@if (details != null)
+{
+     
+        <div class="col-xl-4 col-lg-6 col-md-12">
+            <div class="campaign-table">
+                <div class="row campaign-bottom mt-2">
+                    <div class="col pr-0 campaign-status">
+                        <div class="custom-control custom-checkbox site-select">
+                            <input @onchange="@((args) => OnSelect.InvokeAsync(new object[] { listingid, details.domain, args.Value, details.visitors }))" type="checkbox" class="custom-control-input" id="customCheck_@listingid" />
+                            <label class="custom-control-label" for="customCheck_@listingid">  Select</label>
+                        </div>
+                    </div>
+                    <div class="col-auto ml-0 mr-0 text-right">
+                        <div class="sort-average">
+                           
+                        </div>
+                    </div>
+                </div>
+                <div class="campaign-preview mt-3 mb-3">
+                    <a href="https://@details.domain" target="_blank" > <img src="https://testapi.vendo.media/download/websitelistinglogo?id=@details.logoid" class="img-fluid" /></a>
+                </div>
+                <div class="row campaign-headline mb-2">
+                    <div class="col ml-0 mr-0"></div>
+                    <div class="col ml-0 mr-0 text-right"><span><a target="_blank" href="https://@details.domain">@details.domain</a></span></div>
+                </div>
+                <div class="row campaign-headline">
+                    <div class="col ml-0 mr-0">Monthly views</div>
+                    <div class="col ml-0 mr-0 text-right"><span>@details.visitors</span></div>
+                </div>
+                <div class="row campaign-headline">
+                    <div class="col ml-0 mr-0">Registered users</div>
+                    <div class="col ml-0 mr-0 text-right"><span>@details.users</span></div>
+                </div>
+            </div>
+        </div>
+     
+}
+
+
+
+
+
+
+
+
+@code {
+    [Parameter]
+    public string listingid { get; set; }
+
+    [Parameter]
+    public EventCallback<object[]> OnSelect { get; set; }
+
+
+    GeneralModels.Advertiser.CreateCampaigns.Websites.ListingModel details;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+      
+        details = await GeneralLogic.Advertiser.CreateCampaigns.CreateWebsiteCampaign.GetOneRecordForDisplay(listingid);
+    }
+
+}

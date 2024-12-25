@@ -1,0 +1,328 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Urihelper
+@inject IJSRuntime js
+
+
+ 
+
+@if (usertype == 1)
+{
+    <div class="container-fluid general-page">
+        <div class="row">
+
+            <div class="col-auto left-navbar" style="background-color: rgb(0, 0, 0) !important" id="sidebarnew">
+                <div class="navbar-logo row">
+                    <div class="logo-left col">
+                        <h1>Vendo</h1>
+                        <p style="color:#ffffff;padding-left:10px;">     Advertiser</p> 
+                    </div>
+                    <div class="navbar-navigation col-auto text-right">
+                        <a class="nav-line" onclick="menuopen()">
+                            <ul class="right navbutton">
+                                <li class="navli"></li>
+                                <li class="navli"></li>
+                                <li class="navli"></li>
+                            </ul>
+                        </a>
+                    </div>
+
+                </div>
+                <nav class="sidebar">
+
+                    <ul class="accordion" id="accordionExample">
+
+
+                        <li class="nav-item multimenu" id="headingThree">
+                            <a class="nav-link" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree"><i class="fas fa-sitemap"></i><span>Websites<i class="menu-arrow"></i></span></a>
+                            <div class="collapse" id="collapseThree" aria-labelledby="headingThree" data-parent="#accordionExample">
+                                <ul class="border-bottom-0 p-0">
+                                    <li><a href="/advertiser/websitestatistics/campaignlistpage"><i class="fas fa-circle"></i>Campaigns</a></li>
+                                    <li><a href="/advertiser/createwebsitecampaignbegin"><i class="fas fa-circle"></i>Create Campaign</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item multimenu">
+                            <a class="nav-link" href="/cashaccount/overviewpage"><i class="fas fa-wallet"></i><span>Cash Account</span></a>
+                        </li>
+                        <li class="nav-item multimenu">
+                            <a class="nav-link" href="/accountpage"><i class="fas fa-user"></i><span>Account</span></a> 
+                        </li>
+                        <li class="nav-item multimenu"> 
+                            <a class="nav-link" href="/subscriptionpage"><i class="fas fa-user"></i><span>Subscription</span></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="col" style="background-color: #969c97 !important">
+                <NavMenuAdvertiser messagecount="@messagecount" messagefordisplay_title="@messagetitle" messagefordisplay_message="@messagecontent" OnLogout="@(async (args) => await LogOut(args))" SwitchUserTypes="@(async (args) => await switchuser(args))" />
+
+                @if (!_isloading)
+                {
+                    @Body
+                }
+
+
+
+
+
+
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+}
+else
+{
+    <div class="container-fluid general-page">
+        <div class="row">
+
+            <div class="col-auto left-navbar" style="background-color: rgb(0, 0, 0) !important" id="sidebarnew">
+                <div class="navbar-logo row">
+                    <div class="logo-left col">
+                        <h1>Vendo</h1> 
+                        <p style="color:#ffffff;padding-left:10px;">     Publisher</p>
+                    </div>
+                    <div class="navbar-navigation col-auto text-right">
+                        <a class="nav-line" onclick="menuopen()">
+                            <ul class="right navbutton">
+                                <li class="navli"></li>
+                                <li class="navli"></li>
+                                <li class="navli"></li>
+                            </ul>
+                        </a>
+                    </div>
+
+                </div>
+                <nav class="sidebar">
+
+                    <ul class="accordion" id="accordionExample">
+
+
+                        <li class="nav-item multimenu" id="headingThree">
+                            <a class="nav-link" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree"><i class="fas fa-sitemap"></i><span>Websites<i class="menu-arrow"></i></span></a>
+                            <div class="collapse" id="collapseThree" aria-labelledby="headingThree" data-parent="#accordionExample">
+                                <ul class="border-bottom-0 p-0">
+                                    <li><a href="/influencer/websitestatistics/campaignlistpage"><i class="fas fa-circle"></i>Campaigns</a></li>
+                                    <li><a href="/websites/listingmanager"><i class="fas fa-circle"></i>My listings</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item multimenu" id="headingFour">
+                            <a class="nav-link" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour"><i class="fas fa-file-invoice"></i><span>Account<i class="menu-arrow"></i></span></a>
+                            <div class="collapse" id="collapseFour" aria-labelledby="headingFour" data-parent="#accordionExample">
+                                <ul class="border-bottom-0 p-0">
+                                    <li><a href="/financial/payoutpage"><i class="fas fa-circle"></i>Payouts</a></li>
+                                    <li><a href="/accountpage"><i class="fas fa-circle"></i>Profile</a></li>
+                                    <li  >
+                                        <a   href="/subscriptionpage"><i class="fas fa-circle"></i><span>Subscription</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="col datatable" style=" background-color: #969c97 !important">
+                <NavMenuInfluencer messagecount="@messagecount" messagefordisplay_title="@messagetitle" messagefordisplay_message="@messagecontent" OnLogout="@(async (args) => await LogOut(args))" SwitchUserTypes="@(async (args) => await switchuser(args))" />
+
+                @if (!_isloading)
+                {
+                    @Body
+                }
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+    <!-- End page -->
+
+
+
+
+}
+
+@code {
+
+    bool _isloading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+
+            string token = await js.InvokeAsync<string>("localStorage.getItem", "Auth");
+
+
+
+            if (token != "" && token != null)
+            {
+                IEnumerable<string> ioin;
+                if (!GeneralLogic.GeneralObjects.httpClient_api.DefaultRequestHeaders.TryGetValues("Auth", out ioin))
+                {
+                    Console.WriteLine(token);
+
+
+                    GeneralLogic.GeneralObjects.httpClient_api.DefaultRequestHeaders.Add("Auth", token);
+                    _isloading = false;
+                    Console.WriteLine(_isloading);
+                    StateHasChanged();
+                     
+                }
+
+                GeneralLogic.GeneralObjects.messagecenterdata.Messages = await GeneralLogic.MessageCenter.Retrieval.GetAll();
+            //    CheckNotifications();
+
+                messagecount = GeneralLogic.GeneralObjects.messagecenterdata.Messages.Count;
+                if (messagecount == 0)
+                {
+
+                    messagetitle = "";
+                    messagecontent = "";
+                    _isloading = false;
+                    return;
+                }
+                messagetitle = GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].title;
+                if (GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].mesage.Length > 100)
+                {
+                    messagecontent = GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].mesage.Substring(0, 100) + "...";
+                }
+                else
+                {
+                    messagecontent = GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].mesage;
+                }
+
+                _isloading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                _isloading = false;
+                StateHasChanged();
+                Console.WriteLine("not found");
+                Urihelper.NavigateTo("/loginpage");
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            _isloading = false;
+            StateHasChanged();
+            Console.WriteLine(e.Message);
+            Urihelper.NavigateTo("/loginpage");
+        }
+    }
+
+    int messagecount = 0;
+    string messagetitle = "";
+    string messagecontent = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        if (!firstrender)
+        {
+            return;
+        }
+
+
+        if (Urihelper.Uri.Contains("advertiser"))
+        {
+            usertype = 1;
+        }
+
+        if (Urihelper.Uri.Contains("influencer"))
+        {
+            usertype = 2;
+        }
+
+
+
+
+
+    }
+
+    async Task CheckNotifications()
+    {
+        DateTime lastcheck = DateTime.UtcNow;
+        while (true)
+        {
+            await Task.Delay(5000);
+            var tempnew = await GeneralLogic.MessageCenter.Retrieval.GetLatest(lastcheck);
+
+
+
+            messagecount = GeneralLogic.GeneralObjects.messagecenterdata.Messages.Count;
+            if (messagecount == 0)
+            {
+                messagetitle = "";
+                messagecontent = "";
+                StateHasChanged();
+                continue;
+            }
+            foreach (var item in tempnew)
+            {
+                GeneralLogic.GeneralObjects.messagecenterdata.Messages.Add(item);
+            }
+            messagetitle = GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].title;
+            if (GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].mesage.Length > 100)
+            {
+                messagecontent = GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].mesage.Substring(0, 100);
+            }
+            else
+            {
+                messagecontent = GeneralLogic.GeneralObjects.messagecenterdata.Messages.OrderBy(x => x.datecreated).ToList()[0].mesage;
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    int usertype = 1;
+    async Task switchuser(int newtype)
+    {
+        try
+        {
+            var res = await GeneralLogic.Authorization.Authorization.ChangeCurrentAccountType(newtype);
+
+            if (res)
+            {
+                usertype = newtype;
+                if (usertype == 1)
+                {
+                    Urihelper.NavigateTo("/advertiser/websitestatistics/campaignlistpage");
+                }
+                else
+                {
+                    Urihelper.NavigateTo("/influencer/websitestatistics/campaignlistpage");
+                }
+            }
+
+
+        }
+        catch (Exception e)
+        {
+
+
+        }
+
+    }
+
+
+    async Task LogOut(object args)
+    {
+        await js.InvokeVoidAsync("localStorage.removeItem", "Auth");
+        Urihelper.NavigateTo("/loginpage");
+    }
+}
