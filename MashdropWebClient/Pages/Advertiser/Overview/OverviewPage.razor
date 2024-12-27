@@ -1,146 +1,70 @@
-﻿
-@inject IJSRuntime js
+﻿@inject IJSRuntime js
 
-
-
-
-
-
-
-
-<div class="row inside-header header2" id="closeOnClick">
-    <div class="col-lg col-12">
-        <h1 class="mt-2"><i class="fas fa-eye"></i> OVERVIEW</h1>
-    </div>
-    <div class="col-12 col-md-auto form-group mb-0 pr-0">
-
-    </div>
-    <div class="col-12 col-md-auto form-group mb-0">
-
-    </div>
-
+<div class="overview-header">
+    <h1 class="overview-title"><i class="fas fa-eye"></i> Overview</h1>
 </div>
 
 @if (campaignListItems != null && campaignListItems.Count != 0)
 {
-    <div class="row inside-header header2 stats-header pt-0">
-        <hr class="sort-hr w-100 mt-0" />
-        <div class="col-xl-2 col-lg-4 col-sm-4">
-            <span>@campaignListItems.Count</span><br />Total Live Campaigns
+    <div class="overview-stats">
+        <div class="stat-card">
+            <span>@campaignListItems.Count</span>
+            <p>Total Live Campaigns</p>
         </div>
-
-        <div class="col-xl-2 col-lg-4 col-sm-4">
-            <span>@campaignListItems.Sum(x => x.clicks)</span><br />Total Clicks
+        <div class="stat-card">
+            <span>@campaignListItems.Sum(x => x.clicks)</span>
+            <p>Total Clicks</p>
         </div>
-
-        <div class="col-xl-2 col-lg-4 col-sm-4">
-            <span>@campaignListItems.Sum(x => x.impressions)</span><br />Total Impressions
+        <div class="stat-card">
+            <span>@campaignListItems.Sum(x => x.impressions)</span>
+            <p>Total Impressions</p>
         </div>
-
-        <div class="col-xl-2 col-lg-4  col-sm-4">
-            <span>@(campaignListItems.Sum(x => x.clicks) / campaignListItems.Sum(x => x.impressions)) %</span><br />CTR
+        <div class="stat-card">
+            <span>@(campaignListItems.Sum(x => x.clicks) / campaignListItems.Sum(x => x.impressions)) %</span>
+            <p>CTR</p>
         </div>
-
-        <div class="col-xl-2 col-lg-4  col-sm-4">
-            <span>$0</span><br />Total Spend
+        <div class="stat-card">
+            <span>$0</span>
+            <p>Total Spend</p>
         </div>
-
-        <div class="col-xl-2 col-lg-4 col-sm-4">
-            <span>$0</span><br />Available
+        <div class="stat-card">
+            <span>$0</span>
+            <p>Available</p>
         </div>
     </div>
 }
 else
 {
-    <p style="color:#ffffff">Nothing to display yet</p>
+    <p class="no-data">Nothing to display yet</p>
 }
-
-
-
-
-
-
 
 @if (campaignListItems != null)
 {
-
-
-
-    <div class="campaign-table over-datatable table-limit1">
-
-        <div class="table-responsive">
-            <table class="table table-sm mb-0">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Channel</th>
-                        <th scope="col">Start Date / End Date</th>
-                        <th scope="col">Impressions / Clicks</th>
-                        <th scope="col">Budget left</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in campaignListItems)
-                    {
-                        <tr>
-                            <td>@item.id</td>
-                            <td>@item.title</td>
-                            <td><input type="range" class="custom-range" min="1" max="3" value="2" id="customRange1" /></td>
-                            <td><span class="green">Social</span></td>
-                            <td>TV,FB</td>
-                            <td>@item.startdate.ToLocalTime().ToString() / @item.enddate.ToLocalTime().ToString()</td>
-                            <td>@item.impressions / @item.clicks</td>
-                            <td>$@item.budgetleft</td>
-                            @if (item.campaigntype == 1)
-                            {
-
-                                @switch (item.websitecampaignstatus)
-                                {
-                                    case 1:
-                                        <td><a href="#" class="btn-text-green"><i class="fas fa-chart-line"></i></a> <a href="#" class="btn-text-green"><i class="fas fa-cog"></i></a></td>
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                            else
-                            {
-
-                            }
-
-                        </tr>
-                    }
-
-
-                </tbody>
-            </table>
-        </div>
-
-
+    <div class="campaign-container">
+        @foreach (var item in campaignListItems)
+        {
+            <div class="campaign-card">
+                <h2 class="campaign-title">@item.title<br><span>(@item.websitecampaignstatus)</span></h2>
+                <p class="campaign-status">Status: @item.websitecampaignstatus</p>
+                <p class="campaign-metrics">Clicks: @item.clicks</p>
+                <p class="campaign-metrics">Impressions: @item.impressions</p>
+                <p class="campaign-budget">Budget Left: $@item.budgetleft</p>
+                <a href="#" class="btn-action"><i class="fas fa-chart-line"></i> View</a>
+                <a href="#" class="btn-action"><i class="fas fa-cog"></i> Edit</a>
+            </div>
+        }
     </div>
-
+}
+else
+{
+    <p class="no-data">No campaigns to display</p>
 }
 
-
-
-
-
 @code {
-
-    int totalclicks = 0;
-    int totalsocialclicks = 0;
-    int totalwebsiteclicks = 0;
-    // int totalclicks = 0;
-
     List<GeneralModels.Advertiser.Statistics.Overview.CampaignListItemModel> campaignListItems;
-
 
     protected override async Task OnInitializedAsync()
     {
-
+        // Initialize data here
     }
 }
